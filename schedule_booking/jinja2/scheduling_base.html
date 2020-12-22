@@ -1,0 +1,40 @@
+{% for day in days %}
+<table id="table{{ loop.index }}" class="table table-striped table-bordered" {% if loop.index > 1 %} hidden {% endif %}>
+  <thead>
+    <tr>
+      <th scope="col">
+        <div class="input-group">
+          <button onclick="previousday({{ loop.index }})" type="button" {% if loop.revindex > 1 %} disabled {% endif %} class="btn btn-secondary">&lt;</button>
+          <span class="input-group-text">{{ day.strftime("%A %d/%m") }}</span>
+          <button onclick="nextday({{ loop.index }})" type="button" {% if loop.index > 1 %} disabled {% endif %} class="btn btn-secondary">&gt;</button>
+        </div>
+      </th>
+      {% for place in places %}
+      <th scope="col">{{place}}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for hour in schedules[day] %}
+    <tr>
+      <th scope="row">{{ hour["datetime"].strftime("%H:%M") }}</th>
+      {% for place in places %}
+      {% block cell scoped %}
+      {% endblock %}
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+<script>
+function previousday(num) {
+  document.querySelector("#table" + num).setAttribute("hidden", "");
+  document.querySelector("#table" + (num-1)).removeAttribute("hidden");
+}
+
+function nextday(num) {
+  document.querySelector("#table" + num).setAttribute("hidden", "");
+  document.querySelector("#table" + (num+1)).removeAttribute("hidden");
+}
+</script>

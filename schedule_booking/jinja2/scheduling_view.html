@@ -1,0 +1,4 @@
+{% extends "scheduling_base.html" %}
+{% block cell %}
+        <td class="table-{{ app[place.id][hour.id][1] }}">{{ "Personne" if (app[place.id][hour.id][0] == -1.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</td>
+{% endblock %}
