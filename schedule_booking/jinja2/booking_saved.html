@@ -1,4 +1,16 @@
 {% extends "base.html" %}
+{% block navbar %}
+<li class="nav-item">
+  <a class="nav-link" href="/">Acceuil</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/planning/">Planning</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="/inscription/">Inscription</a>
+</li>
+{% endblock %}
+
 {% block content %}
 <p>Votre inscription a bien été enregistré. Vous devriez recevoir un email de confirmation. Dans le cas contraire, ne vous inquiétez pas et venez tout de même au lycée pour les portes ouvertes.</p>
 {% endblock %}

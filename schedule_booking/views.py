@@ -5,6 +5,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models.functions import Cast
 from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 
 def get_option(request, option):
@@ -100,6 +101,44 @@ def scheduling_booking(request):
         except ValidationError as e:
             s = scheduling(request)
             s["errors"] = e
+            return render(request, "scheduling_page_booking.html", s)
+
+        slots = []
+        for k, v in request.POST.items():
+            if k.endswith("slot") and v == "on":
+                try:
+                    slot = list(map(int, k.split("-")[:2]))  # [Place__id, Schedule__id]
+                except:
+                    pass
+                else:
+                    if (
+                        Place.objects.filter(id=slot[0]).count() > 0
+                        and Schedule.objects.filter(id=slot[1]).count() > 0
+                    ):
+                        slots.append("-".join(list(map(str, slot))))
+
+        forbidden = get_option(request, "forbidden_level")
+        with transaction.atomic():
+            apps_invalid = (
+                Appointment.objects.filter(id__in=slots)
+                .annotate(
+                    density=Cast(F("place__array"), FloatField())
+                    / Cast(Count("students") + 1, FloatField())
+                )
+                .filter(density__lt=forbidden)
+            )
+            if apps_invalid.count() == 0:
+                apps = Appointment.objects.filter(id__in=slots)
+                for a in apps:
+                    a.students.add(student)
+
+        if apps_invalid.count() > 0:
+            s = scheduling(request)
+            s["errors"] = {
+                "message_dict": {
+                    "scheduling": "A cause du délai de réception de votre réservation, des créneaux étant pris entretemps, votre demande n'a pas pu aboutir. Veillez recommencer."
+                }
+            }
             return render(request, "scheduling_page_booking.html", s)
 
         return render(request, "booking_saved.html")

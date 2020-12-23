@@ -24,12 +24,11 @@ class Place(models.Model):
         super().save(*args, **kwargs)
         schedules = Schedule.objects.all()
         for s in schedules:
-            a = Appointment(place=self, schedule=s)
+            a = Appointment(id="%s-%s" % (self.id, s.id), place=self, schedule=s)
             a.save()
 
 
 class Schedule(models.Model):
-
     datetime = models.DateTimeField()
 
     class Meta:
@@ -42,7 +41,7 @@ class Schedule(models.Model):
         super().save(*args, **kwargs)
         places = Place.objects.all()
         for p in places:
-            a = Appointment(place=p, schedule=self)
+            a = Appointment(id="%s-%s" % (p.id, self.id), place=p, schedule=self)
             a.save()
 
 
@@ -60,6 +59,7 @@ class Student(models.Model):
 
 
 class Appointment(models.Model):
+    id = models.CharField(primary_key=True, max_length=100)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     students = models.ManyToManyField(Student)
