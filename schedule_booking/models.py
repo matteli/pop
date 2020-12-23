@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 
 class Config(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
-    group = models.BooleanField(default=True)
+    max_escort = models.IntegerField(default=0)
     caution_level = models.FloatField(default=8)
     warning_level = models.FloatField(default=4)
     forbidden_level = models.FloatField(default=3)

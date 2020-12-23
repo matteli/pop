@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from django.db.models import Count, F, FloatField, Case, When
+from django.db.models import Count, F, FloatField, Case, When, Sum
 from .models import Place, Schedule, Appointment, Config, Student
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models.functions import Cast
 from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.http import HttpResponseBadRequest
 
 
 def get_option(request, option):
@@ -16,34 +17,6 @@ def scheduling(request):
     places = Place.objects.all()
     schedules = {}
     days = Schedule.objects.dates("datetime", "day")
-    for d in days:
-        schedules[d] = Schedule.objects.filter(datetime__date=d)
-    if get_option(request, "group"):
-        appointments = (
-            Appointment.objects.values("place", "schedule")
-            .annotate(people=Count("students"))
-            .annotate(
-                density=Case(
-                    When(people=0, then=-1.0),
-                    default=Cast(F("place__array"), FloatField())
-                    / Cast(F("people"), FloatField()),
-                )
-            )
-        )
-    else:
-        appointments = (
-            Appointment.objects.values("place", "schedule")
-            .annotate(people=Count("students__people"))
-            .annotate(
-                density=Case(
-                    When(people=0, then=-1.0),
-                    default=Cast(F("place__array"), FloatField())
-                    / Cast(F("people"), FloatField()),
-                )
-            )
-        )
-
-    app = {}
     config = {
         "level": {
             "correct": (0.0, "success"),
@@ -51,8 +24,24 @@ def scheduling(request):
             "warning": (get_option(request, "warning_level"), "danger"),
             "forbidden": (get_option(request, "forbidden_level"), "secondary"),
         },
-        "group": get_option(request, "group"),
+        "max_escort": get_option(request, "max_escort"),
     }
+
+    for d in days:
+        schedules[d] = Schedule.objects.filter(datetime__date=d)
+    appointments = (
+        Appointment.objects.values("place", "schedule")
+        .annotate(people=Sum("students__people"))
+        .annotate(
+            density=Case(
+                When(people=0, then=-1.0),
+                default=Cast(F("place__array"), FloatField())
+                / Cast(F("people"), FloatField()),
+            )
+        )
+    )
+
+    app = {}
     for a in appointments:
         if a["place"] not in app:
             app[a["place"]] = {}
@@ -93,6 +82,13 @@ def scheduling_booking(request):
         student.firstname = request.POST["firstname"]
         student.lastname = request.POST["lastname"]
         student.email = request.POST["email"]
+        if "escort" in request.POST:
+            try:
+                student.people = int(request.POST["escort"]) + 1
+            except:
+                return HttpResponseBadRequest()
+        else:
+            student.people = 1
 
         try:
             student.full_clean()
@@ -109,7 +105,7 @@ def scheduling_booking(request):
                 try:
                     slot = list(map(int, k.split("-")[:2]))  # [Place__id, Schedule__id]
                 except:
-                    pass
+                    return HttpResponseBadRequest()
                 else:
                     if (
                         Place.objects.filter(id=slot[0]).count() > 0
@@ -123,7 +119,7 @@ def scheduling_booking(request):
                 Appointment.objects.filter(id__in=slots)
                 .annotate(
                     density=Cast(F("place__array"), FloatField())
-                    / Cast(Count("students") + 1, FloatField())
+                    / Cast(Sum("students__people") + student.people, FloatField())
                 )
                 .filter(density__lt=forbidden)
             )
@@ -140,5 +136,4 @@ def scheduling_booking(request):
                 }
             }
             return render(request, "scheduling_page_booking.html", s)
-
         return render(request, "booking_saved.html")

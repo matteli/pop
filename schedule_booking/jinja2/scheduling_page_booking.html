@@ -30,7 +30,14 @@
     <label for="email">Addresse email</label>
     <div id="validationemail" class="invalid-feedback">{% if errors is defined and errors.message_dict["email"] is defined %} {{ errors.message_dict["email"][0] }} {% endif %}</div>
   </div>
-  <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir la tranche horaire la plus favorable en fontion de vos disponibilités. La valeur indique la surface en mètre carré par {% if config.group %}groupe de personnes{% else %}personnes{% endif %}. La couleur indique les niveaux dépassés : <span class="badge bg-{{ config.level.correct[1] }}">&ge; {{ config.level.caution[0] }} m²</span> <span class="badge bg-{{ config.level.caution[1] }}">&lt; {{ config.level.caution[0] }} m²</span> <span class="badge bg-{{ config.level.warning[1] }}">&lt; {{ config.level.warning[0] }} m²</span> <span class="badge bg-{{ config.level.forbidden[1] }}">&lt; {{ config.level.forbidden[0] }} m²</span> Si ce dernier niveau est dépassé dans un créneau, il n'est plus possible de s'y inscrire.</p>
+  {% if config["max_escort"] %}
+  <div class="form-floating mb-3">
+    <input type="number" name="escort" class="form-control {% if errors is defined and errors.message_dict['escort'] is defined %}is-invalid{% endif %}" id="escort" value="{{ request.POST['escort']|default(0) }}" min="0" max="{{ config['max_escort'] }}" required>
+    <label for="escort">Nombre d'accompagnateurs</label>
+    <div id="validationescort" class="invalid-feedback">{% if errors is defined and errors.message_dict["escort"] is defined %} {{ errors.message_dict["escort"][0] }} {% endif %}</div>
+  </div>
+  {% endif %}
+  <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir la tranche horaire la plus favorable en fontion de vos disponibilités. La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personnes{% endif %}. La couleur indique les niveaux dépassés : <span class="badge bg-{{ config.level.correct[1] }}">&ge; {{ config.level.caution[0] }} m²</span> <span class="badge bg-{{ config.level.caution[1] }}">&lt; {{ config.level.caution[0] }} m²</span> <span class="badge bg-{{ config.level.warning[1] }}">&lt; {{ config.level.warning[0] }} m²</span> <span class="badge bg-{{ config.level.forbidden[1] }}">&lt; {{ config.level.forbidden[0] }} m²</span> Si ce dernier niveau est dépassé dans un créneau, il n'est plus possible de s'y inscrire.</p>
   {% if errors is defined and errors.message_dict["scheduling"] is defined %}
   <div class="alert alert-danger" role="alert">
     {{ errors.message_dict["scheduling"] }}
