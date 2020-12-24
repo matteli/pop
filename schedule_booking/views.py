@@ -25,6 +25,7 @@ def scheduling(request):
             "forbidden": (get_option(request, "forbidden_level"), "secondary"),
         },
         "max_escort": get_option(request, "max_escort"),
+        "max_slot": get_option(request, "max_slot"),
     }
 
     for d in days:
@@ -78,6 +79,23 @@ def scheduling_booking(request):
         s = scheduling(request)
         return render(request, "scheduling_page_booking.html", s)
     elif request.method == "POST":
+        slots = []
+        for k, v in request.POST.items():
+            if k.endswith("slot") and v == "on":
+                try:
+                    slot = list(map(int, k.split("-")[:2]))  # [Place__id, Schedule__id]
+                except:
+                    return HttpResponseBadRequest()
+                else:
+                    if (
+                        Place.objects.filter(id=slot[0]).count() > 0
+                        and Schedule.objects.filter(id=slot[1]).count() > 0
+                    ):
+                        slots.append("-".join(list(map(str, slot))))
+
+        if not (0 < len(slots) <= get_option(request, "max_slot")):
+            return HttpResponseBadRequest()
+
         student = Student()
         student.firstname = request.POST["firstname"]
         student.lastname = request.POST["lastname"]
@@ -99,20 +117,6 @@ def scheduling_booking(request):
             s["errors"] = e
             return render(request, "scheduling_page_booking.html", s)
 
-        slots = []
-        for k, v in request.POST.items():
-            if k.endswith("slot") and v == "on":
-                try:
-                    slot = list(map(int, k.split("-")[:2]))  # [Place__id, Schedule__id]
-                except:
-                    return HttpResponseBadRequest()
-                else:
-                    if (
-                        Place.objects.filter(id=slot[0]).count() > 0
-                        and Schedule.objects.filter(id=slot[1]).count() > 0
-                    ):
-                        slots.append("-".join(list(map(str, slot))))
-
         forbidden = get_option(request, "forbidden_level")
         with transaction.atomic():
             apps_invalid = (
@@ -130,9 +134,10 @@ def scheduling_booking(request):
 
         if apps_invalid.count() > 0:
             s = scheduling(request)
+            student.delete()
             s["errors"] = {
                 "message_dict": {
-                    "scheduling": "A cause du délai de réception de votre réservation, des créneaux étant pris entretemps, votre demande n'a pas pu aboutir. Veillez recommencer."
+                    "scheduling": "Avec votre réservation, des créneaux atteignent le dernier niveau. Veillez recommencer en privilégiant des créneaux verts ou jaunes."
                 }
             }
             return render(request, "scheduling_page_booking.html", s)

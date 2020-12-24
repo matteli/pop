@@ -5,7 +5,7 @@
     {% if app[place.id][hour.id][1] == config['level']['forbidden'][1] %}
     <input type="checkbox" class="btn-check" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" disabled autocomplete="off">
     {% else %}
-    <input type="checkbox" class="btn-check" name="{{ '%s-%s-slot' % (place.id, hour.id) }}" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" autocomplete="off">
+    <input type="checkbox" class="btn-check control" name="{{ '%s-%s-slot' % (place.id, hour.id) }}" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" autocomplete="off">
     {% endif %}
     <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Personne" if (app[place.id][hour.id][0] == -1.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</label>
   </div>
