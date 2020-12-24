@@ -136,7 +136,7 @@ def scheduling_booking(request):
 
         forbidden = get_option(request, "forbidden_level")
         with transaction.atomic():
-            if config["max_escort"]:
+            if get_option(request, "max_escort"):
                 apps_invalid = (
                     Appointment.objects.filter(id__in=slots)
                     .annotate(

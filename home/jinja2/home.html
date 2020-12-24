@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block header %}
+<img src="{{ static('img/abriand.jpg') }}" class="img-fluid" >
+{% endblock %}
 {% block navbar %}
 <li class="nav-item">
   <a class="nav-link active" href="/">Acceuil</a>
@@ -12,5 +15,5 @@
 {% endblock %}
 
 {% block content %}
-Bienvenue
+<h4 class="display-4">Portes ouvertes au lycée Aristide Briand</h4>
 {% endblock %}
