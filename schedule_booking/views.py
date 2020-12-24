@@ -7,6 +7,7 @@ from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponseBadRequest
+import requests
 
 
 def get_option(request, option):
@@ -96,6 +97,17 @@ def scheduling_booking(request):
         s = scheduling(request)
         return render(request, "scheduling_page_booking.html", s)
     elif request.method == "POST":
+        # test recaptcha
+        g = request.POST["g-recaptcha-response"]
+        r = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                "secret": "6LcESxMaAAAAAD8C_eHKDLesZ5EdtwD7ruSaG8_H",
+                "response": g,
+            },
+        )
+        j = r.json()
+
         slots = []
         for k, v in request.POST.items():
             if k.endswith("slot") and v == "on":
