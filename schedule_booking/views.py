@@ -30,17 +30,31 @@ def scheduling(request):
 
     for d in days:
         schedules[d] = Schedule.objects.filter(datetime__date=d)
-    appointments = (
-        Appointment.objects.values("place", "schedule")
-        .annotate(people=Sum("students__people"))
-        .annotate(
-            density=Case(
-                When(people=0, then=-1.0),
-                default=Cast(F("place__array"), FloatField())
-                / Cast(F("people") + 1, FloatField()),
+
+    if config["max_escort"]:
+        appointments = (
+            Appointment.objects.values("place", "schedule")
+            .annotate(people=Sum("students__people"))
+            .annotate(
+                density=Case(
+                    When(people=0, then=-1.0),
+                    default=Cast(F("place__array"), FloatField())
+                    / Cast(F("people") + 1, FloatField()),
+                )
             )
         )
-    )
+    else:
+        appointments = (
+            Appointment.objects.values("place", "schedule")
+            .annotate(people=Count("students"))
+            .annotate(
+                density=Case(
+                    When(people=0, then=-1.0),
+                    default=Cast(F("place__array"), FloatField())
+                    / Cast(F("people") + 1, FloatField()),
+                )
+            )
+        )
 
     app = {}
     for a in appointments:
@@ -122,14 +136,24 @@ def scheduling_booking(request):
 
         forbidden = get_option(request, "forbidden_level")
         with transaction.atomic():
-            apps_invalid = (
-                Appointment.objects.filter(id__in=slots)
-                .annotate(
-                    density=Cast(F("place__array"), FloatField())
-                    / Cast(Sum("students__people") + student.people, FloatField())
+            if config["max_escort"]:
+                apps_invalid = (
+                    Appointment.objects.filter(id__in=slots)
+                    .annotate(
+                        density=Cast(F("place__array"), FloatField())
+                        / Cast(Sum("students__people") + student.people, FloatField())
+                    )
+                    .filter(density__lt=forbidden)
                 )
-                .filter(density__lt=forbidden)
-            )
+            else:
+                apps_invalid = (
+                    Appointment.objects.filter(id__in=slots)
+                    .annotate(
+                        density=Cast(F("place__array"), FloatField())
+                        / Cast(Count("students") + 1, FloatField())
+                    )
+                    .filter(density__lt=forbidden)
+                )
             if apps_invalid.count() == 0:
                 apps = Appointment.objects.filter(id__in=slots)
                 for a in apps:
