@@ -37,7 +37,7 @@ def scheduling(request):
             density=Case(
                 When(people=0, then=-1.0),
                 default=Cast(F("place__array"), FloatField())
-                / Cast(F("people"), FloatField()),
+                / Cast(F("people") + 1, FloatField()),
             )
         )
     )
