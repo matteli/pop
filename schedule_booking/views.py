@@ -57,7 +57,10 @@ def scheduling(request):
         else:
             indication = config["level"]["correct"][1]
 
-        app[a["place"]][a["schedule"]] = (a["density"], indication)
+        app[a["place"]][a["schedule"]] = (
+            a["density"] if get_option(request, "show_density") else 0.0,
+            indication,
+        )
 
     return {
         "places": places,
