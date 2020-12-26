@@ -107,6 +107,8 @@ def scheduling_booking(request):
             },
         )
         j = r.json()
+        if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
+            return HttpResponseBadRequest()
 
         slots = []
         for k, v in request.POST.items():
