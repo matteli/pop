@@ -12,6 +12,26 @@
 {% endblock %}
 
 {% block content %}
-<p>Le planning ci-dessous vous indique pour chaque filière ou formation l'affluence à chaque créneau horaire de 30 min. {% if config.show_density %} La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personnes{% endif %}.{% else %} Une surface disponible par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %} est calculée.{% endif %} La couleur indique les niveaux atteints : <span class="badge bg-{{ config.level.correct[1] }}">&ge; {{ config.level.caution[0] }} m²</span> <span class="badge bg-{{ config.level.caution[1] }}">&lt; {{ config.level.caution[0] }} m²</span> <span class="badge bg-{{ config.level.warning[1] }}">&lt; {{ config.level.warning[0] }} m²</span> <span class="badge bg-{{ config.level.forbidden[1] }}">&lt; {{ config.level.forbidden[0] }} m²</span></p>
+<p>Le planning ci-dessous vous indique pour chaque filière ou formation l'affluence à chaque créneau horaire de 30 min.
+{% if config.show_density %} La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personnes{% endif %}.
+{% else %} Une surface disponible par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %} est calculée.
+{% endif %}
+La couleur indique les niveaux atteints : 
+{% if config.caution_level %}
+<span class="badge bg-success">&ge; {{ config.caution_level }} m²</span>
+<span class="badge bg-warning">&lt; {{ config.caution_level }} m²</span>
+{% elif config.warning_level %}
+<span class="badge bg-success">&ge; {{ config.warning_level }} m²</span>
+{% elif config.forbidden_level %}
+<span class="badge bg-success">&ge; {{ config.forbidden_level }} m²</span>
+{% endif %}
+{% if config.warning_level %}
+<span class="badge bg-danger">&lt; {{ config.warning_level }} m²</span>
+{% endif %}
+{% if config.forbidden_level %}
+<span class="badge bg-secondary">&lt; {{ config.forbidden_level }} m²</span> 
+Si ce dernier niveau est atteint dans un créneau, il n'est plus possible de s'y inscrire.</p>
+{% endif %}
+
 {% include "scheduling_view.html" %}
 {% endblock %}

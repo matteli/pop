@@ -2,7 +2,7 @@
 {% block cell %}
 <td class="table-{{ app[place.id][hour.id][1] }}">
   <div class="d-grid gap-2">
-    {% if app[place.id][hour.id][1] == config['level']['forbidden'][1] %}
+    {% if app[place.id][hour.id][1] == "secondary" %}
     <input type="checkbox" class="btn-check" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" disabled autocomplete="off">
     <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Plein" if (app[place.id][hour.id][0] <= 0.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</label>
     {% else %}

@@ -1,18 +1,45 @@
 from django.db import models
 from django.contrib.sites.models import Site
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Config(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
-    max_escort = models.IntegerField(default=0)
-    max_slot = models.IntegerField(default=2)
-    show_density = models.BooleanField(default=True)
-    caution_level = models.FloatField(default=8)
-    warning_level = models.FloatField(default=4)
-    forbidden_level = models.FloatField(default=3)
-    recaptcha = models.BooleanField(default=False)
-    recaptcha_private = models.CharField(max_length=40, blank=True)
-    recaptcha_public = models.CharField(max_length=40, blank=True)
+    max_escort = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre maximal d'accompagnateurs. La valeur à 0 enlève la demande de cette information.",
+    )
+    max_slot = models.PositiveIntegerField(
+        default=2,
+        help_text="Nombre maximal de créneaux sélectionnable par inscription.",
+    )
+    show_density = models.BooleanField(
+        default=True, help_text="Montrer la surface disponible par personne."
+    )
+    caution_level = models.FloatField(
+        default=8,
+        help_text="Surface en-dessous de laquelle le créneau passe en orange. Si 0, le niveau n'est pas utilisé.",
+    )
+    warning_level = models.FloatField(
+        default=4,
+        help_text="Surface en-dessous de laquelle le créneau passe en rouge. Si 0, le niveau n'est pas utilisé.",
+    )
+    forbidden_level = models.FloatField(
+        default=3,
+        help_text="Surface en-dessous de laquelle le créneau n'est plus sélectionnable. Si 0, le niveau n'est pas utilisé.",
+    )
+    recaptcha = models.BooleanField(
+        default=False,
+        help_text="Ajoute le recaptcha de Google pour empêcher les robots de s'inscrire.",
+    )
+    recaptcha_private = models.CharField(
+        max_length=40, blank=True, help_text="Clé utilisée entre le serveur et google."
+    )
+    recaptcha_public = models.CharField(
+        max_length=40,
+        blank=True,
+        help_text="Clé utilisée entre le client et le serveur.",
+    )
 
     def __str__(self):
         return self.site.name

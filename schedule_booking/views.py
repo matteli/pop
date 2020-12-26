@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Count, F, FloatField, Case, When, Sum
+from django.forms.models import model_to_dict
 from .models import Place, Schedule, Appointment, Config, Student
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models.functions import Cast
@@ -10,27 +11,10 @@ from django.http import HttpResponseBadRequest
 import requests
 
 
-def get_option(request, option):
-    return getattr(Config.objects.get(site=get_current_site(request).id), option)
-
-
-def scheduling(request):
+def scheduling(request, config):
     places = Place.objects.all()
     schedules = {}
     days = Schedule.objects.dates("datetime", "day")
-    config = {
-        "level": {
-            "correct": (0.0, "success"),
-            "caution": (get_option(request, "caution_level"), "warning"),
-            "warning": (get_option(request, "warning_level"), "danger"),
-            "forbidden": (get_option(request, "forbidden_level"), "secondary"),
-        },
-        "max_escort": get_option(request, "max_escort"),
-        "max_slot": get_option(request, "max_slot"),
-        "recaptcha": get_option(request, "recaptcha"),
-        "recaptcha_key": get_option(request, "recaptcha_public"),
-    }
-
     for d in days:
         schedules[d] = Schedule.objects.filter(datetime__date=d)
 
@@ -64,18 +48,18 @@ def scheduling(request):
         if a["place"] not in app:
             app[a["place"]] = {}
         if a["density"] < 0:
-            indication = config["level"]["correct"][1]
-        elif a["density"] <= config["level"]["forbidden"][0]:
-            indication = config["level"]["forbidden"][1]
-        elif a["density"] <= config["level"]["warning"][0]:
-            indication = config["level"]["warning"][1]
-        elif a["density"] <= config["level"]["caution"][0]:
-            indication = config["level"]["caution"][1]
+            indication = "success"
+        elif a["density"] <= config["forbidden_level"]:
+            indication = "secondary"
+        elif a["density"] <= config["warning_level"]:
+            indication = "danger"
+        elif a["density"] <= config["caution_level"]:
+            indication = "warning"
         else:
-            indication = config["level"]["correct"][1]
+            indication = "success"
 
         app[a["place"]][a["schedule"]] = (
-            a["density"] if get_option(request, "show_density") else 0.0,
+            a["density"] if config["show_density"] else 0.0,
             indication,
         )
 
@@ -90,17 +74,27 @@ def scheduling(request):
 
 @require_GET
 def scheduling_view(request):
-    return render(request, "scheduling_page_view.html", scheduling(request))
+    config = model_to_dict(
+        Config.objects.get(site=get_current_site(request).id),
+        exclude=["recaptcha_private"],
+    )
+    return render(request, "scheduling_page_view.html", scheduling(request, config))
 
 
 @require_http_methods(["GET", "POST"])
 def scheduling_booking(request):
+    config = model_to_dict(
+        Config.objects.get(site=get_current_site(request).id),
+        exclude=["recaptcha_private"],
+    )
+
     if request.method == "GET":
-        s = scheduling(request)
+        s = scheduling(request, config)
         return render(request, "scheduling_page_booking.html", s)
     elif request.method == "POST":
+
         # test recaptcha
-        if get_option(request, "recaptcha"):
+        if config["recaptcha"]:
             g = request.POST["g-recaptcha-response"]
             r = requests.post(
                 "https://www.google.com/recaptcha/api/siteverify",
@@ -127,14 +121,14 @@ def scheduling_booking(request):
                     ):
                         slots.append("-".join(list(map(str, slot))))
 
-        if not (0 < len(slots) <= get_option(request, "max_slot")):
+        if not (0 < len(slots) <= config["max_slot"]):
             return HttpResponseBadRequest()
 
         student = Student()
         student.firstname = request.POST["firstname"]
         student.lastname = request.POST["lastname"]
         student.email = request.POST["email"]
-        if "escort" in request.POST:
+        if config["max_escort"] and "escort" in request.POST:
             try:
                 student.people = int(request.POST["escort"]) + 1
             except:
@@ -147,42 +141,48 @@ def scheduling_booking(request):
             student.save()
 
         except ValidationError as e:
-            s = scheduling(request)
+            s = scheduling(request, config)
             s["errors"] = e
             return render(request, "scheduling_page_booking.html", s)
 
-        forbidden = get_option(request, "forbidden_level")
-        with transaction.atomic():
-            if get_option(request, "max_escort"):
-                apps_invalid = (
-                    Appointment.objects.filter(id__in=slots)
-                    .annotate(
-                        density=Cast(F("place__array"), FloatField())
-                        / Cast(Sum("students__people") + student.people, FloatField())
+        if config["forbidden_level"]:
+            with transaction.atomic():
+                if config["max_escort"]:
+                    apps_invalid = (
+                        Appointment.objects.filter(id__in=slots)
+                        .annotate(
+                            density=Cast(F("place__array"), FloatField())
+                            / Cast(
+                                Sum("students__people") + student.people, FloatField()
+                            )
+                        )
+                        .filter(density__lt=config["forbidden_level"])
                     )
-                    .filter(density__lt=forbidden)
-                )
-            else:
-                apps_invalid = (
-                    Appointment.objects.filter(id__in=slots)
-                    .annotate(
-                        density=Cast(F("place__array"), FloatField())
-                        / Cast(Count("students") + 1, FloatField())
+                else:
+                    apps_invalid = (
+                        Appointment.objects.filter(id__in=slots)
+                        .annotate(
+                            density=Cast(F("place__array"), FloatField())
+                            / Cast(Count("students") + 1, FloatField())
+                        )
+                        .filter(density__lt=config["forbidden_level"])
                     )
-                    .filter(density__lt=forbidden)
-                )
-            if apps_invalid.count() == 0:
-                apps = Appointment.objects.filter(id__in=slots)
-                for a in apps:
-                    a.students.add(student)
+                if apps_invalid.count() == 0:
+                    apps = Appointment.objects.filter(id__in=slots)
+                    for a in apps:
+                        a.students.add(student)
 
-        if apps_invalid.count() > 0:
-            s = scheduling(request)
-            student.delete()
-            s["errors"] = {
-                "message_dict": {
-                    "scheduling": "Avec votre réservation, des créneaux atteignent le dernier niveau. Veillez recommencer en privilégiant des créneaux verts ou jaunes."
+            if apps_invalid.count() > 0:
+                s = scheduling(request, config)
+                student.delete()
+                s["errors"] = {
+                    "message_dict": {
+                        "scheduling": "Avec votre réservation, des créneaux atteignent le dernier niveau. Veillez recommencer en privilégiant des créneaux verts ou jaunes."
+                    }
                 }
-            }
-            return render(request, "scheduling_page_booking.html", s)
+                return render(request, "scheduling_page_booking.html", s)
+        else:
+            apps = Appointment.objects.filter(id__in=slots)
+            for a in apps:
+                a.students.add(student)
         return render(request, "booking_saved.html")
