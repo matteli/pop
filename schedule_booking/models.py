@@ -10,6 +10,9 @@ class Config(models.Model):
     caution_level = models.FloatField(default=8)
     warning_level = models.FloatField(default=4)
     forbidden_level = models.FloatField(default=3)
+    recaptcha = models.BooleanField(default=False)
+    recaptcha_private = models.CharField(max_length=40, blank=True)
+    recaptcha_public = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return self.site.name

@@ -27,6 +27,8 @@ def scheduling(request):
         },
         "max_escort": get_option(request, "max_escort"),
         "max_slot": get_option(request, "max_slot"),
+        "recaptcha": get_option(request, "recaptcha"),
+        "recaptcha_key": get_option(request, "recaptcha_public"),
     }
 
     for d in days:
@@ -98,17 +100,18 @@ def scheduling_booking(request):
         return render(request, "scheduling_page_booking.html", s)
     elif request.method == "POST":
         # test recaptcha
-        g = request.POST["g-recaptcha-response"]
-        r = requests.post(
-            "https://www.google.com/recaptcha/api/siteverify",
-            data={
-                "secret": "6LcESxMaAAAAAD8C_eHKDLesZ5EdtwD7ruSaG8_H",
-                "response": g,
-            },
-        )
-        j = r.json()
-        if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
-            return HttpResponseBadRequest()
+        if get_option(request, "recaptcha"):
+            g = request.POST["g-recaptcha-response"]
+            r = requests.post(
+                "https://www.google.com/recaptcha/api/siteverify",
+                data={
+                    "secret": get_option(request, "recaptcha_private"),
+                    "response": g,
+                },
+            )
+            j = r.json()
+            if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
+                return HttpResponseBadRequest()
 
         slots = []
         for k, v in request.POST.items():

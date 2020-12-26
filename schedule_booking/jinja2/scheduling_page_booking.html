@@ -11,7 +11,11 @@
 </li>
 {% endblock %}
 {% block content %}
-<form id="form" action="/inscription/" method="POST" onsubmit="return control(event)">
+{% if config.recaptcha %}
+<form id="form" action="/inscription/" method="POST">
+{% else %}
+<form id="form" action="/inscription/" method="POST" onsubmit="return control()">
+  {% endif %}
   {{ csrf_input }}
   <p>Afin de limiter les affluences et garantir la sécurité de tous, nous vous demandons de vous inscrire afin de participer aux portes ouvertes du lycée Aristide Briand. Une seule inscription est demandée par famille.</p>
   <div class="form-floating mb-3">
@@ -44,17 +48,25 @@
   {% endif %}
   <div class="alert alert-danger" id="schedulingerror2" role="alert" hidden></div>
   {% include "scheduling_booking.html" %}
-  <button type="submit" data-sitekey="6LcESxMaAAAAAPaTOnCciSSMqpV--VZJvJN1Vp6f" data-callback='onSubmit' data-action='submit'class="btn btn-primary g-recaptcha">Valider</button>
+  {% if config.recaptcha %}
+  <button type="submit" data-sitekey="{{ config.recaptcha_key }}" data-callback="onSubmit" data-action="submit" class="btn btn-primary g-recaptcha">Valider</button>
+  {% else %}
+  <button type="submit" class="btn btn-primary">Valider</button>
+  {% endif %}
 </form>
+{% if config.recaptcha %}
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
   function onSubmit(token) {
-    document.getElementById("form").submit();
+    if (control()){
+      document.getElementById("form").submit();
+    }
   }
 </script>
+{% endif %}
 
 <script>
-  function control(event) {
+  function control() {
     var num = 0;
     const slots = document.querySelectorAll(".control");
     slots.forEach(slot => {if (slot.checked){num+=1}});
