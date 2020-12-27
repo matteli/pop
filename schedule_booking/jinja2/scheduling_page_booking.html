@@ -80,7 +80,19 @@
   }
 </script>
 {% endif %}
-
+{% if config.max_slot==1 %} 
+<script>
+  const max_slot = 1;
+  const t1 = "Vous devez sélectionner un créneau horaire.";
+  const t2 = "Vous devez sélectionner au plus un créneau horaire.";
+</script>
+{% else %}
+<script>
+  const max_slot = {{ config.max_slot }};
+  const t1 = "Vous devez sélectionner un ou plusieurs créneaux horaires.";
+  const t2 = "Vous devez sélectionner au plus " + max_slot + " créneaux horaires.";
+</script>
+{% endif %}
 <script>
   function control() {
     var num = 0;
@@ -89,24 +101,14 @@
     if (num==0){
       const alert = document.getElementById("schedulingerror2");
       alert.innerHTML = "";
-      if ({{ config.max_slot }}==1 ){
-        var t = document.createTextNode("Vous devez sélectionner un créneau horaire.");
-      }
-      else {
-        var t = document.createTextNode("Vous devez sélectionner un ou plusieurs créneaux horaires.");
-      }
+      var t = document.createTextNode(t1);
       alert.appendChild(t);
       alert.removeAttribute("hidden");
       return false;
-    } else if (num > {{ config.max_slot }}) {
+    } else if (num > max_slot) {
       const alert = document.getElementById("schedulingerror2");
       alert.innerHTML = "";
-      if ({{ config.max_slot }}==1 ){
-        var t = document.createTextNode("Vous devez sélectionner au plus " + {{ config.max_slot }} + " créneau horaire.");
-      }
-      else {
-        var t = document.createTextNode("Vous devez sélectionner au plus " + {{ config.max_slot }} + " créneaux horaires.");
-      }
+      var t = document.createTextNode(t2);
       alert.appendChild(t);
       alert.removeAttribute("hidden");
       return false;
