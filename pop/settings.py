@@ -21,12 +21,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "o0mcn@-++r-hffr@=&(et16-*(8v9a34&8&^(4cfsay$svhxun"
+SECRET_KEY = "secret"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [*]
 
 
 # Application definition
@@ -131,3 +131,11 @@ USE_TZ = False
 STATIC_URL = "/static/"
 
 SITE_ID = 1
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "localhost"
+EMAIL_USE_TLS = False
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+DEFAULT_FROM_EMAIL = "Lycée Aristide Briand <po@abriand.info>"
