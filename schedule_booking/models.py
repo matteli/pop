@@ -40,6 +40,9 @@ class Config(models.Model):
         blank=True,
         help_text="Clé utilisée entre le client et le serveur.",
     )
+    send_email_confirmation = models.BooleanField(
+        default=False, help_text="Envoie un email de confirmation d'inscription."
+    )
 
     def __str__(self):
         return self.site.name

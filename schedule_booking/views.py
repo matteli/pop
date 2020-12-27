@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponseBadRequest
+from django.core.mail import EmailMessage
 import requests
 
 
@@ -76,7 +77,7 @@ def scheduling(request, config):
 def scheduling_view(request):
     config = model_to_dict(
         Config.objects.get(site=get_current_site(request).id),
-        exclude=["recaptcha_private"],
+        exclude=["recaptcha_private", "send_email_confirmation"],
     )
     return render(request, "scheduling_page_view.html", scheduling(request, config))
 
@@ -87,6 +88,7 @@ def scheduling_booking(request):
         Config.objects.get(site=get_current_site(request).id),
     )
     config_recaptcha_private = config.pop("recaptcha_private")
+    config_send_email_confirmation = config.pop("send_email_confirmation")
 
     if request.method == "GET":
         s = scheduling(request, config)
@@ -185,4 +187,15 @@ def scheduling_booking(request):
             apps = Appointment.objects.filter(id__in=slots)
             for a in apps:
                 a.students.add(student)
+
+        if config_send_email_confirmation:
+            email = EmailMessage(
+                "Inscription aux portes ouvertes du lycée Aristide Briand",
+                "Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est confirmée. En pièce jointe, vous trouverez un fichier récapitulant les informations nécessaires.",
+                settings.EMAIL_HOST_USER,
+                [
+                    student.email,
+                ],
+            )
+
         return render(request, "booking_saved.html")
