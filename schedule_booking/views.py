@@ -192,7 +192,7 @@ def scheduling_booking(request):
             email = EmailMessage(
                 "Inscription aux portes ouvertes du lycée Aristide Briand",
                 "Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est confirmée. En pièce jointe, vous trouverez un fichier récapitulant les informations nécessaires.",
-                settings.EMAIL_HOST_USER,
+                settings.DEFAULT_FROM_EMAIL,
                 [student.email],
             )
 
