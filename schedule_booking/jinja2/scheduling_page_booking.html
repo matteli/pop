@@ -65,7 +65,7 @@
   <div class="alert alert-danger" id="schedulingerror2" role="alert" hidden></div>
   {% include "scheduling_booking.html" %}
   {% if config.recaptcha %}
-  <button type="submit" data-sitekey="{{ config.recaptcha_key }}" data-callback="onSubmit" data-action="submit" class="btn btn-primary g-recaptcha">Valider</button>
+  <button type="submit" data-sitekey="{{ config.recaptcha_public }}" data-callback="onSubmit" data-action="submit" class="btn btn-primary g-recaptcha">Valider</button>
   {% else %}
   <button type="submit" class="btn btn-primary">Valider</button>
   {% endif %}

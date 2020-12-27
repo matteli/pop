@@ -85,8 +85,8 @@ def scheduling_view(request):
 def scheduling_booking(request):
     config = model_to_dict(
         Config.objects.get(site=get_current_site(request).id),
-        exclude=["recaptcha_private"],
     )
+    config_recaptcha_private = config.pop("recaptcha_private")
 
     if request.method == "GET":
         s = scheduling(request, config)
@@ -99,7 +99,7 @@ def scheduling_booking(request):
             r = requests.post(
                 "https://www.google.com/recaptcha/api/siteverify",
                 data={
-                    "secret": get_option(request, "recaptcha_private"),
+                    "secret": config_recaptcha_private,
                     "response": g,
                 },
             )
