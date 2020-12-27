@@ -177,7 +177,7 @@ def scheduling_booking(request):
                 student.delete()
                 s["errors"] = {
                     "message_dict": {
-                        "scheduling": "Avec votre réservation, des créneaux atteignent le dernier niveau. Veillez recommencer en privilégiant des créneaux verts ou jaunes."
+                        "scheduling": "Avec votre réservation, des créneaux atteignent le dernier niveau. Veuillez recommencer en privilégiant des créneaux verts ou jaunes."
                     }
                 }
                 return render(request, "scheduling_page_booking.html", s)
