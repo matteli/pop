@@ -4,9 +4,9 @@
     <tr>
       <th scope="col">
         <div class="input-group">
-          <button onclick="previousday({{ loop.index }})" type="button" {% if loop.revindex > 1 or loop.length == 1 %} disabled {% endif %} class="btn btn-secondary">&lt;</button>
+          <button onclick="previousday({{ loop.index }})" type="button" {% if loop.index == 1 or loop.length == 1 %} disabled {% endif %} class="btn btn-secondary">&lt;</button>
           <span class="input-group-text">{{ day.strftime("%A %d/%m") }}</span>
-          <button onclick="nextday({{ loop.index }})" type="button" {% if loop.index > 1 or loop.length == 1 %} disabled {% endif %} class="btn btn-secondary">&gt;</button>
+          <button onclick="nextday({{ loop.index }})" type="button" {% if loop.revindex == 1 or loop.length == 1 %} disabled {% endif %} class="btn btn-secondary">&gt;</button>
         </div>
       </th>
       {% for place in places %}

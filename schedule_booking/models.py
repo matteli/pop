@@ -81,13 +81,41 @@ class Schedule(models.Model):
 
 
 class Student(models.Model):
-    lastname = models.CharField(max_length=100)
-    firstname = models.CharField(max_length=100)
+    SCHOOLS_CHOICE = [
+        (
+            "Cité scolaire",
+            (
+                ("LAB", "Lycée Aristide Briand"),
+                ("LBB", "Lycée Brosseaud-Blancho"),
+            ),
+        ),
+        (
+            "Lycée de secteur",
+            (
+                ("LEX", "Lycée expérimental"),
+                ("LHE", "Lycée Heinlex"),
+            ),
+        ),
+        (
+            "Collège de secteur",
+            (
+                ("CAV", "Collège Albert Vincon"),
+                ("CAC", "Collège Anita Conti"),
+            ),
+        ),
+        ("Autres", (("OTH", "Autres étblissements"),)),
+    ]
+
+    lastname = models.CharField(max_length=100, verbose_name="Nom")
+    firstname = models.CharField(max_length=100, verbose_name="Prénom")
+    school = models.CharField(
+        max_length=3, choices=SCHOOLS_CHOICE, verbose_name="Etablissement d'origine"
+    )
     email = models.EmailField(
         unique=True,
         error_messages={"unique": "Un visiteur avec cet email s'est déjà inscrit."},
     )
-    people = models.IntegerField(default=1)
+    people = models.IntegerField(default=1, verbose_name="Nombre de personne")
 
     def __str__(self):
         return "%s %s" % (self.firstname, self.lastname)

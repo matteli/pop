@@ -10,7 +10,7 @@
   <body>
     {% block header %}{% endblock %}
     <div class="container">
-      <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+      <nav class="navbar navbar-expand-lg position-absolute top-0 start-0 end-0 navbar-dark bg-dark">
         <div class="container-fluid">
           <a class="navbar-brand" href="/">
             <img src='{{ static("img/logow.svg") }}' alt="" height="40">
@@ -26,10 +26,20 @@
           </div>
         </div>
       </nav>
-      <div id="content">
-        {% block content %}{% endblock %}
-      </div>
+      <main class="py-3">
+        <div id="content">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
     </div>
+    <footer class="mt-auto py-3 bg-light">
+      <div class="container">
+        <h5 class="text-center">Lycée Aristide Briand</h5>
+        <p class="text-center">10 boulevard Pierre de Coubertin - BP418 - 44606 Saint-Nazaire cedex<br>
+        Tél : 02 40 00 25 25 - Fax : 02 40 00 25 00 - Courriel : ce.0440069l@ac-nantes.fr<br>
+        Site web : <a href="https://aristide-briand.paysdelaloire.e-lyco.fr">https://aristide-briand.paysdelaloire.e-lyco.fr</a></p>
+      </div>
+    </footer>
     <script src='{{ static("js/bootstrap.bundle.min.js") }}'></script>
   </body>
 </html>

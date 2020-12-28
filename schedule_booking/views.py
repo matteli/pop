@@ -15,6 +15,7 @@ from pop import settings
 
 def scheduling(request, config):
     places = Place.objects.all()
+    schools = Student.SCHOOLS_CHOICE
     schedules = {}
     days = Schedule.objects.dates("datetime", "day")
     for d in days:
@@ -71,6 +72,7 @@ def scheduling(request, config):
         "schedules": schedules,
         "days": days,
         "app": app,
+        "schools": schools,
         "config": config,
     }
 
