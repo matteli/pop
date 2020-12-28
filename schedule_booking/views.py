@@ -10,6 +10,7 @@ from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.core.mail import EmailMessage
 import requests
+from pop import settings
 
 
 def scheduling(request, config):
@@ -22,7 +23,8 @@ def scheduling(request, config):
     if config["max_escort"]:
         appointments = (
             Appointment.objects.values("place", "schedule")
-            .annotate(people=Sum("students__people"))
+            .annotate(stu=Count("students"))
+            .annotate(people=Case(When(stu=0, then=0), default=Sum("students__people")))
             .annotate(
                 density=Case(
                     When(people=0, then=-1.0),
@@ -71,6 +73,16 @@ def scheduling(request, config):
         "app": app,
         "config": config,
     }
+
+
+def body_email(apps):
+    r = "\n"
+    s = (
+        f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est confirmée.\n\n"
+        f"Vous êtes attendus :\n"
+        f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
+    )
+    return s
 
 
 @require_GET
@@ -188,12 +200,13 @@ def scheduling_booking(request):
             for a in apps:
                 a.students.add(student)
 
+        apps_dict = apps.values("place__name", "schedule__datetime")
         if config_send_email_confirmation:
             email = EmailMessage(
                 "Inscription aux portes ouvertes du lycée Aristide Briand",
-                "Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est confirmée. En pièce jointe, vous trouverez un fichier récapitulant les informations nécessaires.",
+                body_email(apps_dict),
                 settings.DEFAULT_FROM_EMAIL,
                 [student.email],
             )
-
-        return render(request, "booking_saved.html")
+        context = {"apps": apps_dict}
+        return render(request, "booking_saved.html", context)

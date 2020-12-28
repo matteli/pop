@@ -12,5 +12,16 @@
 {% endblock %}
 
 {% block content %}
-<p>Votre inscription a bien été enregistré. Vous devriez recevoir un email de confirmation. Dans le cas contraire, ne vous inquiétez pas et venez tout de même au lycée pour les portes ouvertes.</p>
+<br>
+<p>Votre inscription a bien été enregistré.</p>
+<p>Vous êtes attendus :
+<ul>
+  {% for a in apps %}
+  <li>
+    le {{ a.schedule__datetime.strftime("%A") }} à {{ a.schedule__datetime.strftime("%H:%M") }} pour visiter l'emplacement {{ a.place__name }}
+  </li>
+  {% endfor %}
+</ul>
+</p>
+<p>Vous devriez recevoir un email de confirmation. Dans le cas contraire, ne vous inquiétez pas et venez tout de même au lycée pour les portes ouvertes.</p>
 {% endblock %}
