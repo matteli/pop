@@ -80,7 +80,7 @@ def body_email(apps):
     s = (
         f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est confirmée.\n\n"
         f"Vous êtes attendus :\n"
-        f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
+        f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
     )
     return s
 
