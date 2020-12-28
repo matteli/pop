@@ -11,13 +11,14 @@
 </li>
 {% endblock %}
 {% block content %}
+<br>
+<p>Afin de limiter les affluences et garantir la sécurité de tous, nous vous demandons de vous inscrire afin de participer aux portes ouvertes du lycée Aristide Briand. Une seule inscription est demandée par famille.</p>
 {% if config.recaptcha %}
 <form id="form" action="/inscription/" method="POST">
 {% else %}
 <form id="form" action="/inscription/" method="POST" onsubmit="return control()">
   {% endif %}
   {{ csrf_input }}
-  <p>Afin de limiter les affluences et garantir la sécurité de tous, nous vous demandons de vous inscrire afin de participer aux portes ouvertes du lycée Aristide Briand. Une seule inscription est demandée par famille.</p>
   <div class="form-floating mb-3">
     <input type="text" name="firstname" class="form-control {% if errors is defined and errors.message_dict['firstname'] is defined %}is-invalid{% endif %}" id="firstname" placeholder="Robert" value="{{ request.POST['firstname']|default() }}" required>
     <label for="firstname">Prénom</label>
@@ -40,7 +41,10 @@
     <div id="validationescort" class="invalid-feedback">{% if errors is defined and errors.message_dict["escort"] is defined %} {{ errors.message_dict["escort"][0] }} {% endif %}</div>
   </div>
   {% endif %}
-  <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir le créneau horaire le plus favorable en fontion de vos disponibilités.{% if config.show_density %} La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personnes{% endif %}.{% else %} Une surface disponible par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %} est calculée.{% endif %}
+  <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir le créneau horaire le plus favorable en fontion de vos disponibilités.
+    {% if config.show_density %} La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %}.
+    {% else %} Une surface disponible par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %} est calculée.
+    {% endif %}
     <span>La couleur indique les niveaux atteints : </span>
     {% if config.caution_level %}
     <span class="badge bg-success">&ge; {{ config.caution_level }} m²</span>

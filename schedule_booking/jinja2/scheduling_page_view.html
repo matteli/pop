@@ -12,8 +12,9 @@
 {% endblock %}
 
 {% block content %}
+<br>
 <p>Le planning ci-dessous vous indique pour chaque filière ou formation l'affluence à chaque créneau horaire de 30 min.
-{% if config.show_density %} La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personnes{% endif %}.
+{% if config.show_density %} La valeur indique la surface disponible en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %}.
 {% else %} Une surface disponible par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %} est calculée.
 {% endif %}
 La couleur indique les niveaux atteints : 
