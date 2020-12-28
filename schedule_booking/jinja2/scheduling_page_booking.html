@@ -12,11 +12,7 @@
 {% endblock %}
 {% block content %}
 <p>Afin de limiter les affluences et garantir la sécurité de tous, la participation aux portes ouvertes du lycée Aristide Briand se fait uniquement sur inscription. Une seule inscription est demandée par famille.</p>
-{% if config.recaptcha %}
-<form id="form" action="/inscription/" method="POST">
-{% else %}
-<form id="form" action="/inscription/" method="POST" onsubmit="return control()">
-{% endif %}
+<form method="POST" id="form">
   {{ csrf_input }}
   <div class="form-floating mb-3">
     <input type="text" name="firstname" class="form-control {% if errors is defined and errors.message_dict['firstname'] is defined %}is-invalid{% endif %}" id="firstname" placeholder="Robert" value="{{ request.POST['firstname']|default() }}" required>
@@ -81,36 +77,27 @@
   <div class="alert alert-danger" id="schedulingerror2" role="alert" hidden></div>
   {% include "scheduling_booking.html" %}
   {% if config.recaptcha %}
-  <button type="submit" data-sitekey="{{ config.recaptcha_public }}" data-callback="onSubmit" data-action="submit" class="btn btn-primary g-recaptcha">Valider</button>
+  <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+  <button type="submit" class="btn btn-primary">Valider</button>
   {% else %}
   <button type="submit" class="btn btn-primary">Valider</button>
   {% endif %}
 </form>
-{% if config.recaptcha %}
-<script src="https://www.google.com/recaptcha/api.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ config.recaptcha_public }}"></script>
+
 <script>
-  function onSubmit(token) {
-    if (control()){
-      document.getElementById("form").submit();
-    }
+  var form = document.getElementById("form");
+  form.addEventListener("submit", submit, true);
+  function submit(e) {
+    e.preventDefault();
+    grecaptcha.ready(function() {
+      grecaptcha.execute("{{ config.recaptcha_public }}", {action: 'submit'}).then(function(token) {
+        document.getElementById("g-recaptcha-response").setAttribute("value", token);
+        if (control(e)) form.submit();
+      });
+    });
   }
-</script>
-{% endif %}
-{% if config.max_slot==1 %} 
-<script>
-  const max_slot = 1;
-  const t1 = "Vous devez sélectionner un créneau horaire.";
-  const t2 = "Vous devez sélectionner au plus un créneau horaire.";
-</script>
-{% else %}
-<script>
-  const max_slot = {{ config.max_slot }};
-  const t1 = "Vous devez sélectionner un ou plusieurs créneaux horaires.";
-  const t2 = "Vous devez sélectionner au plus " + max_slot + " créneaux horaires.";
-</script>
-{% endif %}
-<script>
-  function control() {
+  function control(e) {
     var num = 0;
     const slots = document.querySelectorAll(".control");
     slots.forEach(slot => {if (slot.checked){num+=1}});
@@ -131,5 +118,20 @@
     }
     return true;
   }
+
 </script>
+
+{% if config.max_slot==1 %} 
+<script>
+  const max_slot = 1;
+  const t1 = "Vous devez sélectionner un créneau horaire.";
+  const t2 = "Vous devez sélectionner au plus un créneau horaire.";
+</script>
+{% else %}
+<script>
+  const max_slot = {{ config.max_slot }};
+  const t1 = "Vous devez sélectionner un ou plusieurs créneaux horaires.";
+  const t2 = "Vous devez sélectionner au plus " + max_slot + " créneaux horaires.";
+</script>
+{% endif %}
 {% endblock %}

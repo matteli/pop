@@ -144,6 +144,7 @@ def scheduling_booking(request):
         student.firstname = request.POST["firstname"]
         student.lastname = request.POST["lastname"]
         student.email = request.POST["email"]
+        student.school = request.POST["school"]
         if config["max_escort"] and "escort" in request.POST:
             try:
                 student.people = int(request.POST["escort"]) + 1
