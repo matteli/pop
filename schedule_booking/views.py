@@ -125,7 +125,7 @@ def scheduling_booking(request):
 
         slots = {}
         for k, v in request.POST.items():
-            if k.endswith("slot"):
+            if k.endswith("slot") and v != "0":
                 try:
                     slot = list(map(int, v.split("-")))  # [Place__id, Schedule__id]
                 except:
