@@ -177,8 +177,9 @@ def scheduling_booking(request):
                     )
                 else:
                     apps_invalid = (
-                        Appointment.objects.filter(id__in=slots.values())
-                        .values("place", "schedule")
+                        Appointment.objects.values(  # .filter(id__in=slots.values())
+                            "place", "schedule"
+                        )
                         .annotate(people=Count("students"))
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
