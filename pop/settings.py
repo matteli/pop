@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = "fr-FR"
-locale.setlocale(locale.LC_TIME, "fr_FR")
+locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
 # TIME_ZONE = "UTC"
 
@@ -129,6 +129,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = ""
 
 SITE_ID = 1
 

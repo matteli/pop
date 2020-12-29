@@ -3,22 +3,22 @@
   <thead>
     <tr>
       <th scope="col">
-        <div class="input-group">
+        <div class="btn-group-vertical">
           <button onclick="previousday({{ loop.index }})" type="button" {% if loop.index == 1 or loop.length == 1 %} disabled {% endif %} class="btn btn-secondary">&lt;</button>
           <span class="input-group-text">{{ day.strftime("%A %d/%m") }}</span>
           <button onclick="nextday({{ loop.index }})" type="button" {% if loop.revindex == 1 or loop.length == 1 %} disabled {% endif %} class="btn btn-secondary">&gt;</button>
         </div>
       </th>
-      {% for place in places %}
-      <th scope="col">{{place}}</th>
+      {% for hour in schedules[day] %}
+      <th scope="row">{{ hour["datetime"].strftime("%H:%M") }}</th>
       {% endfor %}
     </tr>
   </thead>
   <tbody>
-  {% for hour in schedules[day] %}
+  {% for place in places %}
     <tr>
-      <th scope="row">{{ hour["datetime"].strftime("%H:%M") }}</th>
-      {% for place in places %}
+      <th scope="col">{{place}}</th>
+      {% for hour in schedules[day] %}
       {% block cell scoped %}
       {% endblock %}
       {% endfor %}
