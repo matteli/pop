@@ -173,7 +173,6 @@ def scheduling_booking(request):
                             density=Cast(F("place__array"), FloatField())
                             / Cast(F("people") + student.people, FloatField())
                         )
-                        # .filter(density__lt=config["forbidden_level"])
                     )
                 else:
                     apps = (
@@ -183,12 +182,9 @@ def scheduling_booking(request):
                             density=Cast(F("place__array"), FloatField())
                             / Cast(F("people") + 1, FloatField())
                         )
-                        # .filter(density__lt=config["forbidden_level"])
                     )
-                # if apps_invalid.count() == 0:
-                # apps = Appointment.objects.filter(id__in=slots.values())
                 for a in apps:
-                    if a < config["forbidden_level"]:
+                    if a.density < config["forbidden_level"]:
                         ok = False
                         break
                 if ok:
