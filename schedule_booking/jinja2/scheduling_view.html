@@ -1,8 +1,14 @@
 {% extends "scheduling_base.html" %}
+{% block col %}
+<th scope="row">
+  {{ hour["datetime"].strftime("%H:%M") }}
+</th>
+{% endblock %}
+
 {% block cell %}
-        {% if app[place.id][hour.id][1] == "secondary" %}
-        <td class="table-{{ app[place.id][hour.id][1] }}">{{ "Plein" if (app[place.id][hour.id][0] <= 0.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</td>
-        {% else %}
-        <td class="table-{{ app[place.id][hour.id][1] }}">{{ "Libre" if (app[place.id][hour.id][0] <= 0.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</td>
-        {% endif %}
+  {% if app[place.id][hour.id][1] == "secondary" %}
+  <td class="table-{{ app[place.id][hour.id][1] }}">{{ "Plein" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</td>
+  {% else %}
+  <td class="table-{{ app[place.id][hour.id][1] }}">{{ "Libre" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</td>
+  {% endif %}
 {% endblock %}

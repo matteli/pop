@@ -63,7 +63,7 @@ def scheduling(request, config):
             indication = "success"
 
         app[a["place"]][a["schedule"]] = (
-            a["density"] if config["show_density"] else 0.0,
+            a["people"] if config["show_people"] else -1,
             indication,
         )
 

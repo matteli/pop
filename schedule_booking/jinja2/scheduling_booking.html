@@ -12,10 +12,10 @@
   <div class="d-grid gap-2">
     {% if app[place.id][hour.id][1] == "secondary" %}
     <input type="radio" class="btn-check" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" disabled autocomplete="off">
-    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Plein" if (app[place.id][hour.id][0] <= 0.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</label>
+    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Plein" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</label>
     {% else %}
     <input type="radio" class="btn-check control" name="{{ '%s-slot' % (hour.id) }}" value="{{ '%s-%s' % (place.id, hour.id) }}" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" autocomplete="off">
-    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Libre" if (app[place.id][hour.id][0] <= 0.0) else "{0:.1f}".format(app[place.id][hour.id][0]) }}</label>
+    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Libre" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</label>
     {% endif %}
   </div>
 </td>

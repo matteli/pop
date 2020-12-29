@@ -50,10 +50,8 @@
   </div>
   {% endif %}
   <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir le créneau horaire le plus favorable en fontion de vos disponibilités.
-    {% if config.show_density %} La valeur indique la surface en mètre carré par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %}.
-    {% else %} Une surface disponible par {% if not config.max_escort %}groupe de personnes{% else %}personne{% endif %} est calculée.
-    {% endif %}
-    <span>La couleur indique les niveaux atteints : </span>
+    {% if config.show_people %} La valeur indique le nombre de {% if not config.max_escort %}groupes familiaux{% else %}personnes{% endif %}{% endif %}.
+    <span>La couleur indique la surface disponible par {% if not config.max_escort %}groupe familiaux{% else %}personne{% endif %} : </span>
     {% if config.caution_level %}
     <span class="badge bg-success">&ge; {{ config.caution_level }} m²</span>
     <span class="badge bg-warning">&lt; {{ config.caution_level }} m²</span>
@@ -66,7 +64,7 @@
     <span class="badge bg-danger">&lt; {{ config.warning_level }} m²</span>
     {% endif %}
     {% if config.forbidden_level %}
-    <span class="badge bg-secondary">&lt; {{ config.forbidden_level }} m²</span> 
+    <span class="badge bg-secondary">&lt; {{ config.forbidden_level }} m²</span><br>
     Si ce dernier niveau est atteint dans un créneau, il n'est plus possible de s'y inscrire.</p>
     {% endif %}
   {% if errors is defined and errors.message_dict["scheduling"] is defined %}

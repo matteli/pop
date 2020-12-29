@@ -13,8 +13,9 @@ class Config(models.Model):
         default=2,
         help_text="Nombre maximal de créneaux sélectionnable par inscription.",
     )
-    show_density = models.BooleanField(
-        default=True, help_text="Montrer la surface disponible par personne."
+    show_people = models.BooleanField(
+        default=True,
+        help_text="Montrer le nombre de persone ou de groupe de personnes.",
     )
     caution_level = models.FloatField(
         default=8,
