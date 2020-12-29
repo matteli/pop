@@ -86,7 +86,7 @@ class Student(models.Model):
             "Cité scolaire",
             (
                 ("LAB", "Lycée Aristide Briand"),
-                ("LBB", "Lycée Brosseaud-Blancho"),
+                ("LBB", "Lycée Brossaud-Blancho"),
             ),
         ),
         (
