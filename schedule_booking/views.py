@@ -163,11 +163,15 @@ def scheduling_booking(request):
                     apps_invalid = (
                         Appointment.objects.filter(id__in=slots.values())
                         .values("place", "schedule")
+                        .annotate(stu=Count("students"))
+                        .annotate(
+                            people=Case(
+                                When(stu=0, then=0), default=Sum("students__people")
+                            )
+                        )
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
-                            / Cast(
-                                Sum("students__people") + student.people, FloatField()
-                            )
+                            / Cast(F("people") + 1, FloatField())
                         )
                         .filter(density__lt=config["forbidden_level"])
                     )
@@ -175,9 +179,10 @@ def scheduling_booking(request):
                     apps_invalid = (
                         Appointment.objects.filter(id__in=slots.values())
                         .values("place", "schedule")
+                        .annotate(people=Count("students"))
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
-                            / Cast(Count("students") + 1, FloatField())
+                            / Cast(F("people") + 1, FloatField())
                         )
                         .filter(density__lt=config["forbidden_level"])
                     )
