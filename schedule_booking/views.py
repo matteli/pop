@@ -123,11 +123,11 @@ def scheduling_booking(request):
             if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
                 return HttpResponseBadRequest()
 
-        slots = []
+        slots = {}
         for k, v in request.POST.items():
-            if k.endswith("slot") and v == "on":
+            if k.endswith("slot"):
                 try:
-                    slot = list(map(int, k.split("-")[:2]))  # [Place__id, Schedule__id]
+                    slot = list(map(int, v.split("-")))  # [Place__id, Schedule__id]
                 except:
                     return HttpResponseBadRequest()
                 else:
@@ -135,7 +135,7 @@ def scheduling_booking(request):
                         Place.objects.filter(id=slot[0]).count() > 0
                         and Schedule.objects.filter(id=slot[1]).count() > 0
                     ):
-                        slots.append("-".join(list(map(str, slot))))
+                        slots[k] = "-".join(list(map(str, slot)))
 
         if not (0 < len(slots) <= config["max_slot"]):
             return HttpResponseBadRequest()
@@ -166,7 +166,7 @@ def scheduling_booking(request):
             with transaction.atomic():
                 if config["max_escort"]:
                     apps_invalid = (
-                        Appointment.objects.filter(id__in=slots)
+                        Appointment.objects.filter(id__in=slots.values())
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
                             / Cast(
@@ -177,7 +177,7 @@ def scheduling_booking(request):
                     )
                 else:
                     apps_invalid = (
-                        Appointment.objects.filter(id__in=slots)
+                        Appointment.objects.filter(id__in=slots.values())
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
                             / Cast(Count("students") + 1, FloatField())
@@ -185,7 +185,7 @@ def scheduling_booking(request):
                         .filter(density__lt=config["forbidden_level"])
                     )
                 if apps_invalid.count() == 0:
-                    apps = Appointment.objects.filter(id__in=slots)
+                    apps = Appointment.objects.filter(id__in=slots.values())
                     for a in apps:
                         a.students.add(student)
 
@@ -199,7 +199,7 @@ def scheduling_booking(request):
                 }
                 return render(request, "scheduling_page_booking.html", s)
         else:
-            apps = Appointment.objects.filter(id__in=slots)
+            apps = Appointment.objects.filter(id__in=slots.values())
             for a in apps:
                 a.students.add(student)
 
