@@ -10,7 +10,8 @@
         </div>
       </th>
       {% for hour in schedules[day] %}
-      <th scope="row">{{ hour["datetime"].strftime("%H:%M") }}</th>
+      {% block col scoped %}
+      {% endblock %}
       {% endfor %}
     </tr>
   </thead>
