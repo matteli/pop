@@ -167,6 +167,7 @@ def scheduling_booking(request):
                 if config["max_escort"]:
                     apps_invalid = (
                         Appointment.objects.filter(id__in=slots.values())
+                        .values("place", "schedule")
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
                             / Cast(
@@ -178,6 +179,7 @@ def scheduling_booking(request):
                 else:
                     apps_invalid = (
                         Appointment.objects.filter(id__in=slots.values())
+                        .values("place", "schedule")
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
                             / Cast(Count("students") + 1, FloatField())
