@@ -179,13 +179,12 @@ def scheduling_booking(request):
                     apps_invalid = (
                         Appointment.objects.values(  # .filter(id__in=slots.values())
                             "place", "schedule"
-                        )
-                        .annotate(people=Count("students"))
-                        '''.annotate(
-                            density=Cast(F("place__array"), FloatField())
-                            / Cast(F("people") + 1, FloatField())
-                        )
-                        .filter(density__lt=config["forbidden_level"])'''
+                        ).annotate(people=Count("students"))
+                        # .annotate(
+                        #    density=Cast(F("place__array"), FloatField())
+                        #    / Cast(F("people") + 1, FloatField())
+                        # )
+                        # .filter(density__lt=config["forbidden_level"])'''
                     )
                 if apps_invalid.count() == 0:
                     apps = Appointment.objects.filter(id__in=slots.values())
