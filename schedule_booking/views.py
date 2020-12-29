@@ -158,11 +158,11 @@ def scheduling_booking(request):
             return render(request, "scheduling_page_booking.html", s)
 
         if config["forbidden_level"]:
+            ok = True
             with transaction.atomic():
                 if config["max_escort"]:
-                    apps_invalid = (
+                    apps = (
                         Appointment.objects.filter(id__in=slots.values())
-                        .values("place", "schedule")
                         .annotate(stu=Count("students"))
                         .annotate(
                             people=Case(
@@ -173,22 +173,11 @@ def scheduling_booking(request):
                             density=Cast(F("place__array"), FloatField())
                             / Cast(F("people") + student.people, FloatField())
                         )
-                        .filter(density__lt=config["forbidden_level"])
+                        # .filter(density__lt=config["forbidden_level"])
                     )
                 else:
-                    appointments = (
-                        Appointment.objects.values("place", "schedule")
-                        .annotate(people=Count("students"))
-                        .annotate(
-                            density=Cast(F("place__array"), FloatField())
-                            / Cast(F("people") + 1, FloatField())
-                        )
-                    )
-                    if appointments.count() == 0:
-                        pass
-                    apps_invalid = (
+                    apps = (
                         Appointment.objects.filter(id__in=slots.values())
-                        .values("place", "schedule")
                         .annotate(people=Count("students"))
                         .annotate(
                             density=Cast(F("place__array"), FloatField())
@@ -196,12 +185,17 @@ def scheduling_booking(request):
                         )
                         # .filter(density__lt=config["forbidden_level"])
                     )
-                if apps_invalid.count() == 0:
-                    apps = Appointment.objects.filter(id__in=slots.values())
+                # if apps_invalid.count() == 0:
+                # apps = Appointment.objects.filter(id__in=slots.values())
+                for a in apps:
+                    if a < config["forbidden_level"]:
+                        ok = False
+                        break
+                if ok:
                     for a in apps:
                         a.students.add(student)
 
-            if apps_invalid.count() > 0:
+            if not ok:
                 s = scheduling(request, config)
                 student.delete()
                 s["errors"] = {
