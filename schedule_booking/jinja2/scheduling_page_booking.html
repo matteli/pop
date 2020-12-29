@@ -88,12 +88,16 @@
   form.addEventListener("submit", submit, true);
   function submit(e) {
     e.preventDefault();
+    {% if config.recaptcha %}
     grecaptcha.ready(function() {
       grecaptcha.execute("{{ config.recaptcha_public }}", {action: 'submit'}).then(function(token) {
         document.getElementById("g-recaptcha-response").setAttribute("value", token);
         if (control(e)) form.submit();
       });
     });
+    {% else %}
+    if (control(e)) form.submit();
+    {% endif %}
   }
   function control(e) {
     var num = 0;
