@@ -27,23 +27,18 @@ def scheduling(request, config):
             .annotate(stu=Count("students"))
             .annotate(people=Case(When(stu=0, then=0), default=Sum("students__people")))
             .annotate(
-                density=Case(
-                    When(people=0, then=-1.0),
-                    default=Cast(F("place__array"), FloatField())
-                    / Cast(F("people") + 1, FloatField()),
-                )
+                density=Cast(F("place__array"), FloatField())
+                / Cast(F("people") + 1, FloatField())
             )
         )
+
     else:
         appointments = (
             Appointment.objects.values("place", "schedule")
             .annotate(people=Count("students"))
             .annotate(
-                density=Case(
-                    When(people=0, then=-1.0),
-                    default=Cast(F("place__array"), FloatField())
-                    / Cast(F("people") + 1, FloatField()),
-                )
+                density=Cast(F("place__array"), FloatField())
+                / Cast(F("people") + 1, FloatField())
             )
         )
 
