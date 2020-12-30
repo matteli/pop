@@ -1,4 +1,5 @@
 {% extends "scheduling_base.html" %}
+
 {% block col %}
 <th scope="row">
   {{ hour["datetime"].strftime("%H:%M") }}
@@ -11,4 +12,10 @@
   {% else %}
   <td class="table-{{ app[place.id][hour.id][1] }}">{{ "Libre" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</td>
   {% endif %}
+{% endblock %}
+
+{% block colfooter %}
+<th scope="row">
+  {{ hour["datetime"].strftime("%H:%M") }}
+</th>
 {% endblock %}

@@ -14,6 +14,7 @@
         {% block col scoped %}
         {% endblock %}
         {% endfor %}
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
@@ -24,9 +25,20 @@
         {% block cell scoped %}
         {% endblock %}
         {% endfor %}
+        <th scope="col">{{place}}</th>
       </tr>
     {% endfor %}
     </tbody>
+    <tfoot>
+      <th scope="col">
+        {{ day.strftime("%A %d/%m") }}
+      </th>
+      {% for hour in schedules[day] %}
+      {% block colfooter scoped %}
+      {% endblock %}
+      {% endfor %}
+      <th scope="col"></th>
+    </tfoot>
   </table>
 </div>
 {% endfor %}

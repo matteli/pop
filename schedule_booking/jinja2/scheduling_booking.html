@@ -1,12 +1,11 @@
 {% extends "scheduling_base.html" %}
-{% block col %}
+
+{% block colfooter %}
 <th scope="row">
-  <div class="d-grid gap-2">
-    <input type="radio" class="btn-check" name="{{ '%s-slot' % (hour.id) }}" value="0" id="btn-check-{{ '%s' % (hour.id) }}" autocomplete="off" checked="checked">
-    <label class="btn btn-outline-primary" for="btn-check-{{ '%s' % (hour.id) }}">{{ hour["datetime"].strftime("%H:%M") }}</label>
-  </div>
+  {{ hour["datetime"].strftime("%H:%M") }}
 </th>
 {% endblock %}
+
 {% block cell %}
 <td class="table-{{ app[place.id][hour.id][1] }}">
   <div class="d-grid gap-2">
@@ -19,4 +18,13 @@
     {% endif %}
   </div>
 </td>
+{% endblock %}
+
+{% block col %}
+<th scope="row">
+  <div class="d-grid gap-2">
+    <input type="radio" class="btn-check" name="{{ '%s-slot' % (hour.id) }}" value="0" id="btn-check-{{ '%s' % (hour.id) }}" autocomplete="off" checked="checked">
+    <label class="btn btn-outline-primary" for="btn-check-{{ '%s' % (hour.id) }}">{{ hour["datetime"].strftime("%H:%M") }}</label>
+  </div>
+</th>
 {% endblock %}
