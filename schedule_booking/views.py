@@ -213,5 +213,6 @@ def scheduling_booking(request):
                 settings.DEFAULT_FROM_EMAIL,
                 [student.email],
             )
+            email.send()
         context = {"apps": apps_dict}
         return render(request, "booking_saved.html", context)
