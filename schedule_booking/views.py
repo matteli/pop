@@ -78,6 +78,8 @@ def body_email(apps):
         f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est notée.\n\n"
         f"Vous êtes attendus :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
+        f"\n"
+        f"Le lycée Aristide Briand"
     )
     return s
 
