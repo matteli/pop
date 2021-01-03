@@ -74,14 +74,12 @@
     {{ errors.message_dict["scheduling"] }}
   </div>
   {% endif %}
-  <div class="alert alert-danger" id="schedulingerror2" role="alert" hidden></div>
   {% include "scheduling_booking.html" %}
   {% if config.recaptcha %}
   <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
-  <button type="submit" class="btn btn-primary">Valider</button>
-  {% else %}
-  <button type="submit" class="btn btn-primary">Valider</button>
   {% endif %}
+  <div class="alert alert-danger" id="schedulingerror2" role="alert" hidden></div>
+  <button type="submit" class="btn btn-primary">Valider</button>
 </form>
 <script src="https://www.google.com/recaptcha/api.js?render={{ config.recaptcha_public }}"></script>
 
