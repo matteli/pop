@@ -78,8 +78,10 @@ def body_email(apps):
         f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est notée.\n\n"
         f"Vous êtes attendus :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
-        f"\n"
+        f"\n\n"
         f"Le lycée Aristide Briand"
+        f"\n\n"
+        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante (ce.0440069l@ac-nantes.fr)."
     )
     return s
 
@@ -90,8 +92,10 @@ def body_email_test(apps):
         f"Nous vous confirmons que le test de votre inscription aux portes ouvertes du lycée Aristide Briand est réussi.\n\n"
         f"Vous n'êtes pas encore attendus :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
-        f"\n"
+        f"\n\n"
         f"Le lycée Aristide Briand"
+        f"\n\n"
+        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante (ce.0440069l@ac-nantes.fr)."
     )
     return s
 
