@@ -89,37 +89,24 @@ class Schedule(models.Model):
             a.save()
 
 
-class Student(models.Model):
-    SCHOOLS_CHOICE = [
-        (
-            "Cité scolaire",
-            (
-                ("LAB", "Lycée Aristide Briand"),
-                ("LBB", "Lycée Brossaud-Blancho"),
-            ),
-        ),
-        (
-            "Lycée de secteur",
-            (
-                ("LEX", "Lycée expérimental"),
-                ("LHE", "Lycée Heinlex"),
-            ),
-        ),
-        (
-            "Collège de secteur",
-            (
-                ("CAV", "Collège Albert Vincon"),
-                ("CAC", "Collège Anita Conti"),
-            ),
-        ),
-        ("Autres", (("OTH", "Autres étblissements"),)),
-    ]
+class School(models.Model):
+    SCHOOLS_CHOICE = (
+        ("COS", "Collège de secteur"),
+        ("COB", "Collège de bassin"),
+        ("LYC", "Lycée"),
+        ("LPR", "Lycée Professionnel"),
+        ("OTH", "Autres étcblissements"),
+    )
+    name = models.CharField(max_length=400, verbose_name="Nom", unique=True)
+    type_school = models.CharField(
+        max_length=3, verbose_name="Type de lycée", choices=SCHOOLS_CHOICE
+    )
 
+
+class Student(models.Model):
     lastname = models.CharField(max_length=100, verbose_name="Nom")
     firstname = models.CharField(max_length=100, verbose_name="Prénom")
-    school = models.CharField(
-        max_length=3, choices=SCHOOLS_CHOICE, verbose_name="Etablissement d'origine"
-    )
+    school = models.ForeignKey(School, on_delete=models.PROTECT)
     email = models.EmailField(
         unique=True,
         error_messages={"unique": "Un visiteur avec cet email s'est déjà inscrit."},
