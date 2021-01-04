@@ -44,6 +44,10 @@ class Config(models.Model):
     send_email_confirmation = models.BooleanField(
         default=False, help_text="Envoie un email de confirmation d'inscription."
     )
+    beta_test = models.BooleanField(
+        default=True,
+        help_text="Permet d'afficher des messages qui préviennent les visiteurs que le site en version de test.",
+    )
 
     def __str__(self):
         return self.site.name
