@@ -15,8 +15,13 @@
 {% block content %}
 <p>Afin de limiter les affluences et garantir la sécurité de tous, la participation aux portes ouvertes du lycée Aristide Briand se fait uniquement sur inscription. Une seule inscription est demandée par famille.</p>
 {% if config.beta_test %}
-<div class="alert alert-danger" id="schedulingerror" role="alert">
-  Ce site est pour l'instant en test. Toutes les inscriptions seront effacées avant la mise en service. Si vous êtes arrivés ici par hasard, regardez <a class="alert-link" href="https://aristide-briand.paysdelaloire.e-lyco.fr/">ici</a> pour des informations sur les portes ouvertes.
+<div class="alert alert-danger" role="alert">
+  Ce site est pour l'instant en test. <strong>Toutes les inscriptions seront effacées avant la mise en service.</strong> Si vous êtes arrivés ici par hasard, regardez <a class="alert-link" href="https://aristide-briand.paysdelaloire.e-lyco.fr/">ici</a> pour des informations sur les portes ouvertes.
+</div>
+{% endif %}
+{% if config.rgpd %}
+<div class="alert alert-warning" role="alert">
+  Les données récoltées sont utilisées uniquement dans le cadre des portes ouvertes du lycée Aristide Briand (association des personnes aux créneaux horaires, rappel par email de l'inscription et des éventuelles modifications liées aux portes ouvertes). Elles seront toutes effacées après cet évènement. 
 </div>
 {% endif %}
 <form method="POST" id="form">

@@ -48,6 +48,10 @@ class Config(models.Model):
         default=True,
         help_text="Permet d'afficher des messages qui préviennent les visiteurs que le site en version de test.",
     )
+    rgpd = models.BooleanField(
+        default=True,
+        help_text="Permet d'afficher des messages en rapport au RGPD.",
+    )
 
     def __str__(self):
         return self.site.name

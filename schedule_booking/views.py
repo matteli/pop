@@ -84,6 +84,18 @@ def body_email(apps):
     return s
 
 
+def body_email_test(apps):
+    r = "\n"
+    s = (
+        f"Nous vous confirmons que le test de votre inscription aux portes ouvertes du lycée Aristide Briand est réussi.\n\n"
+        f"Vous n'êtes pas encore attendus :\n"
+        f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
+        f"\n"
+        f"Le lycée Aristide Briand"
+    )
+    return s
+
+
 @require_GET
 def scheduling_view(request):
     config = model_to_dict(
@@ -211,7 +223,9 @@ def scheduling_booking(request):
         if config_send_email_confirmation:
             email = EmailMessage(
                 "Inscription aux portes ouvertes du lycée Aristide Briand",
-                body_email(apps_dict),
+                body_email(apps_dict)
+                if not config["beta_test"]
+                else body_email_test(apps_dict),
                 settings.DEFAULT_FROM_EMAIL,
                 [student.email],
             )
