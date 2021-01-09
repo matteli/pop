@@ -26,33 +26,25 @@ def scheduling(request, config):
             Appointment.objects.values("place", "schedule")
             .annotate(stu=Count("students"))
             .annotate(people=Case(When(stu=0, then=0), default=Sum("students__people")))
-            .annotate(
-                density=Cast(F("place__array"), FloatField())
-                / Cast(F("people") + 1, FloatField())
-            )
+            .annotate(rate=100 * F("people") / F("place__gauge"))
         )
 
     else:
         appointments = (
             Appointment.objects.values("place", "schedule")
             .annotate(people=Count("students"))
-            .annotate(
-                density=Cast(F("place__array"), FloatField())
-                / Cast(F("people") + 1, FloatField())
-            )
+            .annotate(rate=100 * F("people") / F("place__gauge"))
         )
 
     app = {}
     for a in appointments:
         if a["place"] not in app:
             app[a["place"]] = {}
-        if a["density"] < 0:
-            indication = "success"
-        elif a["density"] <= config["forbidden_level"]:
+        if a["rate"] >= config["forbidden_level"]:
             indication = "secondary"
-        elif a["density"] <= config["warning_level"]:
+        elif a["rate"] >= config["warning_level"]:
             indication = "danger"
-        elif a["density"] <= config["caution_level"]:
+        elif a["rate"] >= config["caution_level"]:
             indication = "warning"
         else:
             indication = "success"
@@ -75,13 +67,15 @@ def scheduling(request, config):
 def body_email(apps):
     r = "\n"
     s = (
-        f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est notée.\n\n"
+        f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est validée.\n\n"
         f"Vous êtes attendus :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
         f"\n\n"
+        f"Le port du masque est obligatoire sur toute la cité scolaire. L'élève doit être accompagné par un seul adulte référent."
+        f"\n\n"
         f"Le lycée Aristide Briand"
         f"\n\n"
-        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante (ce.0440069l@ac-nantes.fr)."
+        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante : ce.0440069l@ac-nantes.fr."
     )
     return s
 
@@ -93,9 +87,11 @@ def body_email_test(apps):
         f"Vous n'êtes pas encore attendus :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
         f"\n\n"
+        f"Le port du masque est obligatoire sur toute la cité scolaire. L'élève doit être accompagné par un seul adulte référent."
+        f"\n\n"
         f"Le lycée Aristide Briand"
         f"\n\n"
-        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante (ce.0440069l@ac-nantes.fr)."
+        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante : ce.0440069l@ac-nantes.fr."
     )
     return s
 
@@ -121,7 +117,6 @@ def scheduling_booking(request):
         s = scheduling(request, config)
         return render(request, "scheduling_page_booking.html", s)
     elif request.method == "POST":
-
         # test recaptcha
         if config["recaptcha"]:
             g = request.POST["g-recaptcha-response"]
@@ -136,7 +131,9 @@ def scheduling_booking(request):
             if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
                 return HttpResponseBadRequest()
 
-        slots = {}
+        slots = []
+        places = []
+        schedules = []
         for k, v in request.POST.items():
             if k.endswith("slot") and v != "0":
                 try:
@@ -148,7 +145,10 @@ def scheduling_booking(request):
                         Place.objects.filter(id=slot[0]).count() > 0
                         and Schedule.objects.filter(id=slot[1]).count() > 0
                     ):
-                        slots[k] = "-".join(list(map(str, slot)))
+                        if not slot[0] in places and not slot[1] in schedules:
+                            places.append(slot[0])
+                            schedules.append(slot[1])
+                            slots.append("-".join(list(map(str, slot))))
 
         if not (0 < len(slots) <= config["max_slot"]):
             return HttpResponseBadRequest()
@@ -180,29 +180,20 @@ def scheduling_booking(request):
             with transaction.atomic():
                 if config["max_escort"]:
                     apps = (
-                        Appointment.objects.filter(id__in=slots.values())
+                        Appointment.objects.filter(id__in=slots)
                         .annotate(stu=Count("students"))
                         .annotate(
                             people=Case(
                                 When(stu=0, then=0), default=Sum("students__people")
                             )
                         )
-                        .annotate(
-                            density=Cast(F("place__array"), FloatField())
-                            / Cast(F("people") + student.people, FloatField())
-                        )
                     )
                 else:
-                    apps = (
-                        Appointment.objects.filter(id__in=slots.values())
-                        .annotate(people=Count("students"))
-                        .annotate(
-                            density=Cast(F("place__array"), FloatField())
-                            / Cast(F("people") + 1, FloatField())
-                        )
+                    apps = Appointment.objects.filter(id__in=slots).annotate(
+                        people=Count("students")
                     )
                 for a in apps:
-                    if a.density < config["forbidden_level"]:
+                    if a.people + student.people > a.place.gauge:
                         ok = False
                         break
                 if ok:
@@ -214,12 +205,12 @@ def scheduling_booking(request):
                 student.delete()
                 s["errors"] = {
                     "message_dict": {
-                        "scheduling": "Avec votre réservation, des créneaux atteignent le dernier niveau. Veuillez recommencer en privilégiant des créneaux verts ou jaunes."
+                        "scheduling": "Des créneaux se sont remplis avant que votre inscription soit validée. Veuillez recommencer avec d'autres créneaux."
                     }
                 }
                 return render(request, "scheduling_page_booking.html", s)
         else:
-            apps = Appointment.objects.filter(id__in=slots.values())
+            apps = Appointment.objects.filter(id__in=slots)
             for a in apps:
                 a.students.add(student)
 

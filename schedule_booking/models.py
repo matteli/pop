@@ -17,17 +17,17 @@ class Config(models.Model):
         default=True,
         help_text="Montrer le nombre de persone ou de groupe de personnes.",
     )
-    caution_level = models.FloatField(
-        default=8,
-        help_text="Surface en-dessous de laquelle le créneau passe en orange. Si 0, le niveau n'est pas utilisé.",
+    caution_level = models.PositiveIntegerField(
+        default=80,
+        help_text="Taux d'occupation à partir duquel le créneau passe en orange. Si 100, le niveau n'est pas utilisé.",
     )
-    warning_level = models.FloatField(
-        default=4,
-        help_text="Surface en-dessous de laquelle le créneau passe en rouge. Si 0, le niveau n'est pas utilisé.",
+    warning_level = models.PositiveIntegerField(
+        default=90,
+        help_text="Taux d'occupation à partir duquel le créneau passe en rouge. Si 100, le niveau n'est pas utilisé.",
     )
-    forbidden_level = models.FloatField(
-        default=3,
-        help_text="Surface en-dessous de laquelle le créneau n'est plus sélectionnable. Si 0, le niveau n'est pas utilisé.",
+    forbidden_level = models.PositiveIntegerField(
+        default=100,
+        help_text="Taux d'occupation à partir duquel l'insciption n'est plus possible. Devrait être à 100.",
     )
     recaptcha = models.BooleanField(
         default=False,
@@ -59,7 +59,7 @@ class Config(models.Model):
 
 class Place(models.Model):
     name = models.CharField(max_length=100)
-    array = models.IntegerField()
+    gauge = models.IntegerField()
 
     def __str__(self):
         return self.name
@@ -92,33 +92,63 @@ class Schedule(models.Model):
 class Student(models.Model):
     SCHOOLS_CHOICE = [
         (
-            "Cité scolaire",
+            "Collèges de secteur",
             (
-                ("LAB", "Lycée Aristide Briand"),
-                ("LBB", "Lycée Brossaud-Blancho"),
+                ("CS01", "Collège René Guy Cadou (Montoir-de-Bretagne)"),
+                ("CS02", "Collège Le Sacré Coeur (Pornichet)"),
+                ("CS03", "Collège René Char (Saint-Joachim)"),
+                ("CS04", "Collège Albert Vinçon (Saint-Nazaire)"),
+                ("CSO5", "Collège Anita Conti (Saint-Nazaire)"),
+                ("CS06", "Collège Jean Moulin (Saint-Nazaire)"),
+                ("CS07", "Collège Pierre Norange (Saint-Nazaire)"),
+                ("CS08", "Collège Saint Louis (Saint-Nazaire)"),
+                ("CS09", "Collège Sainte Thérèse (Saint-Nazaire)"),
+                ("CS10", "Collège Julien Lambot (Trignac)"),
             ),
         ),
         (
-            "Lycée de secteur",
+            "Collèges de bassin",
             (
-                ("LEX", "Lycée expérimental"),
-                ("LHE", "Lycée Heinlex"),
+                ("CB01", "Collège Arthur Rimbaud (Donges)"),
+                ("CB02", "Collège Du Pays Blanc (Guérande)"),
+                ("CB03", "Collège Jacques Brel (Guérande)"),
+                ("CB04", "Collège Saint Jean-Baptiste (Guérande)"),
+                ("CB05", "Collège Jacques Prévert (Herbignac)"),
+                ("CB06", "Collège Saint Joseph (Herbignac)"),
+                ("CB07", "Collège Éric Tabarly (La Baule-Escoublac)"),
+                ("CB08", "Collège Grand Air (La Baule-Escoublac)"),
+                ("CB09", "Collège Jules Verne (Le Pouliguen)"),
+                ("CB10", "Collège La Fontaine (Missilac)"),
+                ("CB11", "Collège Louise Michel (Paimboeuf)"),
+                ("CB12", "Collège Frida Kahlo (Pontchâteau)"),
+                ("CB13", "Collège Quéral (Pontchâteau)"),
+                ("CB14", "Collège Saint Martin (Pontchâteau)"),
+                ("CB15", "Collège Jean Mounes (Pornic)"),
+                ("CB16", "Collège Notre Dame De Recouvrance (Pornic)"),
+                ("CB17", "Collège Jean Mounes (Pornic)"),
+                ("CB18", "Collège Hélène et René Guy Cadou (Saint-Brévin-les-Pins)"),
+                ("CB19", "Collège Saint Joseph (Saint-Brévin-les-Pins)"),
+                ("CB20", "Collège Gabriel Deshayes (Saint-Gildas-des-Bois)"),
+                ("CB21", "Collège Antoine de Saint-Exupéry (Savenay)"),
+                ("CB22", "Collège Mona Ozouf (Savenay)"),
+                ("CB23", "Collège Saint Joseph (Savenay)"),
             ),
         ),
         (
-            "Collège de secteur",
+            "Autres",
             (
-                ("CAV", "Collège Albert Vincon"),
-                ("CAC", "Collège Anita Conti"),
+                ("CHBA", "Autre collège"),
+                ("ALGT", "Lycée général ou technique"),
+                ("ALPR", "Lycée professionel"),
+                ("AUTR", "Autre"),
             ),
         ),
-        ("Autres", (("OTH", "Autres étblissements"),)),
     ]
 
     lastname = models.CharField(max_length=100, verbose_name="Nom")
     firstname = models.CharField(max_length=100, verbose_name="Prénom")
     school = models.CharField(
-        max_length=3, choices=SCHOOLS_CHOICE, verbose_name="Etablissement d'origine"
+        max_length=4, choices=SCHOOLS_CHOICE, verbose_name="Etablissement d'origine"
     )
     email = models.EmailField(
         unique=True,

@@ -1,8 +1,14 @@
 {% extends "scheduling_base.html" %}
 
-{% block colfooter %}
+{% block col %}
 <th scope="row">
+  <div class="text-center">
   {{ hour["datetime"].strftime("%H:%M") }}
+  </div>
+  <div class="d-grid gap-2">
+    <input type="radio" class="btn-check reset reset_{{ hour.id }}" name="{{ '%s-slot' % (hour.id) }}" value="0" id="btn-check-{{ '%s' % (hour.id) }}" autocomplete="off" checked="checked">
+    <label class="btn btn-outline-warning" for="btn-check-{{ '%s' % (hour.id) }}">X</label>
+  </div>
 </th>
 {% endblock %}
 
@@ -11,20 +17,17 @@
   <div class="d-grid gap-2">
     {% if app[place.id][hour.id][1] == "secondary" %}
     <input type="radio" class="btn-check" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" disabled autocomplete="off">
-    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Plein" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</label>
+    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Plein" if (app[place.id][hour.id][0] < 0) else (app[place.id][hour.id][0]~"/"~place.gauge) }}</label>
     {% else %}
-    <input type="radio" class="btn-check control" name="{{ '%s-slot' % (hour.id) }}" value="{{ '%s-%s' % (place.id, hour.id) }}" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" autocomplete="off">
-    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Libre" if (app[place.id][hour.id][0] < 0) else app[place.id][hour.id][0] }}</label>
+    <input type="radio" class="btn-check control place_{{ place.id }} hour_{{ hour.id }}" onclick="clickhour('{{ place.id }}','{{ hour.id }}')"  name="{{ '%s-slot' % (hour.id) }}" value="{{ '%s-%s' % (place.id, hour.id) }}" id="btn-check-{{ '%s-%s' % (place.id, hour.id) }}" autocomplete="off">
+    <label class="btn btn-outline-{{ app[place.id][hour.id][1] }}" for="btn-check-{{ '%s-%s' % (place.id, hour.id) }}">{{ "Libre" if (app[place.id][hour.id][0] < 0) else (app[place.id][hour.id][0]~"/"~place.gauge) }}</label>
     {% endif %}
   </div>
 </td>
 {% endblock %}
 
-{% block col %}
-<th scope="row">
-  <div class="d-grid gap-2">
-    <input type="radio" class="btn-check" name="{{ '%s-slot' % (hour.id) }}" value="0" id="btn-check-{{ '%s' % (hour.id) }}" autocomplete="off" checked="checked">
-    <label class="btn btn-outline-primary" for="btn-check-{{ '%s' % (hour.id) }}">{{ hour["datetime"].strftime("%H:%M") }}</label>
-  </div>
+{% block colfooter %}
+<th scope="row" class="text-center">
+  {{ hour["datetime"].strftime("%H:%M") }}
 </th>
 {% endblock %}
