@@ -74,7 +74,7 @@ class Place(models.Model):
 
 class Schedule(models.Model):
     datetime = models.DateTimeField()
-    authorized = models.CharField(max_length=300, default="CS CB CHBA ALGT ALPR AUTR")
+    authorizeds = models.CharField(max_length=300, default="CS CB CHBA ALGT ALPR AUTR")
 
     class Meta:
         ordering = ["datetime"]

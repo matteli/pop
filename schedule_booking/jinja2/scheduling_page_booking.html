@@ -137,7 +137,7 @@
         const slot_value = slot.value;
         const schedule = slot_value.substring(slot_value.indexOf("-")+1);
         const input = document.getElementById("btn-check-" + schedule);
-        const authorizeds = input.getAttribute("data-authorized").split(" ");
+        const authorizeds = input.getAttribute("data-authorizeds").split(" ");
         const school_choice = document.getElementById("school").value.substring(0,2);
         if (!authorizeds.includes(school_choice))
         {
