@@ -81,16 +81,15 @@
   {% endif %}
   <div class="alert alert-danger" id="schedulingerror2" role="alert" hidden></div>
   <button type="submit" class="btn btn-primary">Valider</button>
-  <button type="button" class="btn btn-warning" id="reset_schedule" onclick="reset()">Reset</button>
+  <button type="button" class="btn btn-warning" id="reset_schedule" onclick="resetschedule()">Reset</button>
 </form>
 <script src="https://www.google.com/recaptcha/api.js?render={{ config.recaptcha_public }}"></script>
 <script>
-  function reset() {
+  function resetschedule() {
     const slots = document.querySelectorAll(".reset");
     slots.forEach(slot => {slot.click()});
   };
   function clickhour(place_id, hour_id) {
-    console.log(place_id);
     const slots = document.querySelectorAll(".place_" + place_id);
     slots.forEach(slot => {
       if (!slot.classList.contains("hour_"+hour_id)){
@@ -130,10 +129,25 @@
   function control(e) {
     var num = 0;
     const slots = document.querySelectorAll(".control");
+    var authorized = true;
     slots.forEach(slot => {
       if (slot.checked){
         num+=1;
-        cl = slot.className;
+
+        const slot_value = slot.value;
+        const schedule = slot_value.substring(slot_value.indexOf("-")+1);
+        const input = document.getElementById("btn-check-" + schedule);
+        const authorizeds = input.getAttribute("data-authorized").split(" ");
+        const school_choice = document.getElementById("school").value.substring(0,2);
+        if (!authorizeds.includes(school_choice))
+        {
+          const alert = document.getElementById("schedulingerror2");
+          alert.innerHTML = "";
+          var t = document.createTextNode(t3);
+          alert.appendChild(t);
+          alert.removeAttribute("hidden");
+          authorized = false;
+        }
       };
     });
     if (num==0){
@@ -151,6 +165,7 @@
       alert.removeAttribute("hidden");
       return false;
     }
+    if (!authorized) return false;
     return true;
   }
 </script>
@@ -160,12 +175,14 @@
   const max_slot = 1;
   const t1 = "Vous devez sélectionner un créneau horaire.";
   const t2 = "Vous devez sélectionner au plus un créneau horaire.";
+  const t3 = "Au vu de votre établissement d'origine, vous ne pouvez pas sélectionner cet horaire. Vérifiez sur la page d'accueil les horaires qui vous sont réservés.";
 </script>
 {% else %}
 <script>
   const max_slot = {{ config.max_slot }};
   const t1 = "Vous devez sélectionner un ou plusieurs créneaux horaires.";
   const t2 = "Vous devez sélectionner au plus " + max_slot + " créneaux horaires.";
+  const t3 = "Au vu de votre établissement d'origine, vous ne pouvez pas sélectionner un ou plusieurs de ces horaires. Vérifiez sur la page d'accueil les horaires qui vous sont réservés.";
 </script>
 {% endif %}
 {% endblock %}

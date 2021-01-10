@@ -131,6 +131,19 @@ def scheduling_booking(request):
             if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
                 return HttpResponseBadRequest()
 
+        student = Student()
+        student.firstname = request.POST["firstname"]
+        student.lastname = request.POST["lastname"]
+        student.email = request.POST["email"]
+        student.school = request.POST["school"]
+        if config["max_escort"] and "escort" in request.POST:
+            try:
+                student.people = int(request.POST["escort"]) + 1
+            except:
+                return HttpResponseBadRequest()
+        else:
+            student.people = 1
+
         slots = []
         places = []
         schedules = []
@@ -152,19 +165,6 @@ def scheduling_booking(request):
 
         if not (0 < len(slots) <= config["max_slot"]):
             return HttpResponseBadRequest()
-
-        student = Student()
-        student.firstname = request.POST["firstname"]
-        student.lastname = request.POST["lastname"]
-        student.email = request.POST["email"]
-        student.school = request.POST["school"]
-        if config["max_escort"] and "escort" in request.POST:
-            try:
-                student.people = int(request.POST["escort"]) + 1
-            except:
-                return HttpResponseBadRequest()
-        else:
-            student.people = 1
 
         try:
             student.full_clean()

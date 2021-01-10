@@ -74,6 +74,7 @@ class Place(models.Model):
 
 class Schedule(models.Model):
     datetime = models.DateTimeField()
+    authorized = models.CharField(max_length=300, default="CS CB CHBA ALGT ALPR AUTR")
 
     class Meta:
         ordering = ["datetime"]
@@ -137,10 +138,10 @@ class Student(models.Model):
         (
             "Autres",
             (
-                ("CHBA", "Autre collège"),
-                ("ALGT", "Lycée général ou technique"),
-                ("ALPR", "Lycée professionel"),
-                ("AUTR", "Autre"),
+                ("AU01", "Autre collège"),
+                ("AU02", "Lycée général ou technique"),
+                ("AU03", "Lycée professionel"),
+                ("AU04", "Autre"),
             ),
         ),
     ]
