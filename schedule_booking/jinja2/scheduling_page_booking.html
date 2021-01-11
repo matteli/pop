@@ -67,8 +67,8 @@
     <div id="validationescort" class="invalid-feedback">{% if errors is defined and errors.message_dict["escort"] is defined %} {{ errors.message_dict["escort"][0] }} {% endif %}</div>
   </div>
   {% endif %}
-  <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir le créneau horaire le plus favorable en fontion de vos disponibilités.
-    {% if config.show_people %} Dans chaque case, la première valeur indique le nombre de {% if not config.max_escort %}groupes familiaux{% else %}personnes{% endif %}{% endif %} déjà inscrit. La deuxième valeur indique la jauge maximale.
+  <p>Le planning ci-dessous vous permet pour chaque filière ou formation de choisir le créneau horaire le plus favorable en fontion de vos disponibilités. Vous pouvez sélectionner, si nécessaire, jusqu'à {{ config.max_slot }} créneaux.
+    {% if config.show_people %} Dans chaque case, la première valeur indique le nombre de {% if not config.max_escort %}groupes familiaux{% else %}personnes{% endif %}{% endif %} déjà inscrits. La deuxième valeur indique la jauge maximale.
     Si la case est verte, il reste encore des places. Si la case est grise, le créneau est complet.</p>
   {% include "scheduling_booking.html" %}
   {% if config.recaptcha %}

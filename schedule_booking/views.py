@@ -68,7 +68,7 @@ def body_email(apps):
     r = "\n"
     s = (
         f"Nous vous confirmons que votre inscription aux portes ouvertes du lycée Aristide Briand est validée.\n\n"
-        f"Vous êtes attendus :\n"
+        f"Vous êtes attendu(e)s :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
         f"\n\n"
         f"Le port du masque est obligatoire sur toute la cité scolaire. L'élève doit être accompagné par un seul adulte référent."
@@ -86,7 +86,7 @@ def body_email_test(apps):
     r = "\n"
     s = (
         f"Nous vous confirmons que le test de votre inscription aux portes ouvertes du lycée Aristide Briand est réussi.\n\n"
-        f"Vous seriez attendus si ce n'était pas un test :\n"
+        f"Vous seriez attendu(e)s si ce n'était pas un test :\n"
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
         f"\n\n"
         f"Le port du masque est obligatoire sur toute la cité scolaire. L'élève doit être accompagné par un seul adulte référent."
