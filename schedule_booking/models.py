@@ -129,7 +129,7 @@ class Student(models.Model):
                 ("CB07", "Collège Éric Tabarly (La Baule-Escoublac)"),
                 ("CB08", "Collège Grand Air (La Baule-Escoublac)"),
                 ("CB09", "Collège Jules Verne (Le Pouliguen)"),
-                ("CB10", "Collège La Fontaine (Missilac)"),
+                ("CB10", "Collège La Fontaine (Missillac)"),
                 ("CB11", "Collège Louise Michel (Paimboeuf)"),
                 ("CB12", "Collège Frida Kahlo (Pontchâteau)"),
                 ("CB13", "Collège Quéral (Pontchâteau)"),
@@ -149,7 +149,7 @@ class Student(models.Model):
             "Autres",
             (
                 ("AU01", "Autre collège"),
-                ("AU02", "Lycée général ou technique"),
+                ("AU02", "Lycée général ou technologique"),
                 ("AU03", "Lycée professionel"),
                 ("AU04", "Autre"),
             ),
