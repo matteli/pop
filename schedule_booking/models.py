@@ -58,8 +58,14 @@ class Config(models.Model):
 
 
 class Place(models.Model):
-    name = models.CharField(max_length=100)
-    gauge = models.IntegerField()
+    name = models.CharField(max_length=100, help_text="Nom du lieu")
+    gauge = models.IntegerField(help_text="Jauge maxi")
+    order = models.IntegerField(
+        help_text="Numéro pour ordonner l'affichage des lieux", default=0
+    )
+
+    class Meta:
+        ordering = ["order"]
 
     def __str__(self):
         return self.name
@@ -73,8 +79,12 @@ class Place(models.Model):
 
 
 class Schedule(models.Model):
-    datetime = models.DateTimeField()
-    authorizeds = models.CharField(max_length=300, default="CS CB CHBA ALGT ALPR AUTR")
+    datetime = models.DateTimeField(help_text="Date et heure du créneau")
+    authorizeds = models.CharField(
+        max_length=300,
+        default="CS CB AU",
+        help_text="Authorisation en fonction de l'école (groupes espacés de 2 lettres)",
+    )
 
     class Meta:
         ordering = ["datetime"]
