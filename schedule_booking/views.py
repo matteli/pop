@@ -162,7 +162,7 @@ def scheduling_booking(request):
                             schedule = Schedule.objects.filter(id=slot[1]).first()
                             if schedule:
                                 authorizeds = schedule.authorizeds.split(" ")
-                                if student.school not in authorizeds:
+                                if student.school[:2] not in authorizeds:
                                     return HttpResponseBadRequest()
                             places.append(slot[0])
                             schedules.append(slot[1])
