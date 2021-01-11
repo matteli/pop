@@ -1,9 +1,4 @@
 {% extends "base.html" %}
-{% block header %}
-<div class="position-relative">
-  <img src="{{ static('img/abriand.jpg') }}" class="img-fluid" >
-</div>
-{% endblock %}
 {% block navbar %}
 <li class="nav-item">
   <a class="nav-link active" href="/">Accueil</a>
@@ -14,6 +9,15 @@
 <li class="nav-item">
   <a class="nav-link" href="/inscription/">Inscription</a>
 </li>
+{% endblock %}
+
+{% block header %}
+<div class="position-relative">
+  <img src="{{ static('img/abriand.jpg') }}" class="img-fluid" >
+  <!--- <div class="alert alert-light position-absolute top-50 start-50 translate-middle">
+    <a href="#" class="display-4  alert-link ">Portes ouvertes 2021</a>
+  </div> --->
+</div>
 {% endblock %}
 
 {% block content %}
@@ -36,7 +40,7 @@
   <hr>
   <h5>13h00 - 16h30</h5>
   <p>Accueil réservé aux élèves de troisième <strong>des collèges du bassin</strong> et à leurs familles<br>
-    Accueil réservé aux élèves des lycées généraux, techniques et professionnels et à leurs familles<br>
+    Accueil réservé aux élèves des lycées généraux, technologiques et professionnels et à leurs familles<br>
     Accueil réservé aux autres publics
   </p>
 </div>
