@@ -7,7 +7,6 @@ from django.db.models.functions import Cast
 from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.http import HttpResponseBadRequest
 from django.core.mail import EmailMessage
 import requests
 from pop import settings
@@ -109,6 +108,12 @@ def scheduling_view(request):
     return render(request, "scheduling_page_view.html", scheduling(request, config))
 
 
+def bad_request(request, config, message="Erreur inconnue. Veuillez recommencer."):
+    s = scheduling(request, config)
+    s["errors"] = {"message_dict": {"scheduling": message}}
+    return render(request, "scheduling_page_booking.html", s)
+
+
 @require_http_methods(["GET", "POST"])
 def scheduling_booking(request):
     config = model_to_dict(
@@ -133,7 +138,7 @@ def scheduling_booking(request):
             )
             j = r.json()
             if not j["success"] or j["action"] != "submit" or j["score"] < 0.5:
-                return HttpResponseBadRequest()
+                return bad_request(request, config)
 
         student = Student()
         student.firstname = request.POST["firstname"]
@@ -145,7 +150,7 @@ def scheduling_booking(request):
             try:
                 student.people = int(request.POST["escort"]) + 1
             except:
-                return HttpResponseBadRequest()
+                return bad_request(request, config)
         else:
             student.people = 1
 
@@ -157,7 +162,7 @@ def scheduling_booking(request):
                 try:
                     slot = list(map(int, v.split("-")))  # [Place__id, Schedule__id]
                 except:
-                    return HttpResponseBadRequest()
+                    return bad_request(request, config)
                 else:
                     if (
                         Place.objects.filter(id=slot[0]).count() > 0
@@ -169,13 +174,30 @@ def scheduling_booking(request):
                                 if schedule:
                                     authorizeds = schedule.authorizeds.split(" ")
                                     if student.school[:2] not in authorizeds:
-                                        return HttpResponseBadRequest()
+                                        return bad_request(
+                                            request,
+                                            config,
+                                            message="Au vu de votre établissement d'origine, vous ne pouvez pas sélectionner un ou plusieurs de ces horaires. Vérifiez sur la page d'accueil les horaires qui vous sont réservés.",
+                                        )
+
                             places.append(slot[0])
                             schedules.append(slot[1])
                             slots.append("-".join(list(map(str, slot))))
+                        else:
+                            return bad_request(
+                                request,
+                                config,
+                                message="Vous avez sélectionné plusieurs lieux au même horaire ou plusieurs horaires au même lieu ce qui est interdit. Veuillez recommencer.",
+                            )
 
         if not (0 < len(slots) <= config["max_slot"]):
-            return HttpResponseBadRequest()
+            return bad_request(
+                request,
+                config,
+                message="Vous avez sélectionné plus de "
+                + str(config["max_slot"])
+                + " créneaux. Veuillez recommencer avec moins de créneaux.",
+            )
 
         try:
             student.full_clean()
@@ -212,14 +234,11 @@ def scheduling_booking(request):
                         a.students.add(student)
 
             if not ok:
-                s = scheduling(request, config)
-                student.delete()
-                s["errors"] = {
-                    "message_dict": {
-                        "scheduling": "Des créneaux se sont remplis avant que votre inscription soit validée. Veuillez recommencer avec d'autres créneaux."
-                    }
-                }
-                return render(request, "scheduling_page_booking.html", s)
+                return bad_request(
+                    request,
+                    config,
+                    message="Des créneaux se sont remplis avant que votre inscription soit validée. Veuillez recommencer avec d'autres créneaux.",
+                )
         else:
             apps = Appointment.objects.filter(id__in=slots)
             for a in apps:
