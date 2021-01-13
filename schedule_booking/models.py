@@ -151,7 +151,7 @@ class Student(models.Model):
         (
             "Autres",
             (
-                ("AU01", "Autre collège"),
+                ("CB24", "Autre collège"),
                 ("AU02", "Lycée général ou technologique"),
                 ("AU03", "Lycée professionel"),
                 ("AU04", "Autre"),
