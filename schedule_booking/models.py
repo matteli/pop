@@ -5,6 +5,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Config(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
+    school = models.BooleanField(
+        default=True, help_text="Demande de l'établissement d'origine."
+    )
     max_escort = models.PositiveIntegerField(
         default=0,
         help_text="Nombre maximal d'accompagnateurs. La valeur à 0 enlève la demande de cette information.",
@@ -159,7 +162,10 @@ class Student(models.Model):
     lastname = models.CharField(max_length=100, verbose_name="Nom")
     firstname = models.CharField(max_length=100, verbose_name="Prénom")
     school = models.CharField(
-        max_length=4, choices=SCHOOLS_CHOICE, verbose_name="Etablissement d'origine"
+        max_length=4,
+        choices=SCHOOLS_CHOICE,
+        default="AU04",
+        verbose_name="Etablissement d'origine",
     )
     email = models.EmailField(
         unique=True,

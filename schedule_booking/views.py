@@ -139,7 +139,8 @@ def scheduling_booking(request):
         student.firstname = request.POST["firstname"]
         student.lastname = request.POST["lastname"]
         student.email = request.POST["email"]
-        student.school = request.POST["school"]
+        if config["school"]:
+            student.school = request.POST["school"]
         if config["max_escort"] and "escort" in request.POST:
             try:
                 student.people = int(request.POST["escort"]) + 1
@@ -163,11 +164,12 @@ def scheduling_booking(request):
                         and Schedule.objects.filter(id=slot[1]).count() > 0
                     ):
                         if not slot[0] in places and not slot[1] in schedules:
-                            schedule = Schedule.objects.filter(id=slot[1]).first()
-                            if schedule:
-                                authorizeds = schedule.authorizeds.split(" ")
-                                if student.school[:2] not in authorizeds:
-                                    return HttpResponseBadRequest()
+                            if config["school"]:
+                                schedule = Schedule.objects.filter(id=slot[1]).first()
+                                if schedule:
+                                    authorizeds = schedule.authorizeds.split(" ")
+                                    if student.school[:2] not in authorizeds:
+                                        return HttpResponseBadRequest()
                             places.append(slot[0])
                             schedules.append(slot[1])
                             slots.append("-".join(list(map(str, slot))))

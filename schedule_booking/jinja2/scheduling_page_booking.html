@@ -42,6 +42,7 @@
     <label for="lastname">Nom de l'élève</label>
     <div id="validationlastname" class="invalid-feedback">{% if errors is defined and errors.message_dict["lastname"] is defined %} {{ errors.message_dict["lastname"][0] }} {% endif %}</div>
   </div>
+  {% if config.school %}
   <div class="form-floating mb-3">
     <select name="school" class="form-control" id="school" value="{{ request.POST['school']|default() }}" required>
       <option selected></option>
@@ -55,6 +56,7 @@
     </select>
     <label for="school">Etablissement d'origine</label>
   </div>
+  {% endif %}
   <div class="form-floating mb-3">
     <input type="email" name="email" class="form-control {% if errors is defined and errors.message_dict['email'] is defined %}is-invalid{% endif %}" id="email" placeholder="robert@exemple.fr" value="{{ request.POST['email']|default() }}" required>
     <label for="email">Adresse email</label>
@@ -133,7 +135,7 @@
     slots.forEach(slot => {
       if (slot.checked){
         num+=1;
-
+        {% if config.school %}
         const slot_value = slot.value;
         const schedule = slot_value.substring(slot_value.indexOf("-")+1);
         const input = document.getElementById("btn-check-" + schedule);
@@ -146,6 +148,7 @@
           alert.removeAttribute("hidden");
           authorized = false;
         }
+        {% endif %}
       };
     });
     if (num==0){
