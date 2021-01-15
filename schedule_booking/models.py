@@ -164,7 +164,7 @@ class Student(models.Model):
     school = models.CharField(
         max_length=4,
         choices=SCHOOLS_CHOICE,
-        default="AU04",
+        default="AU02",
         verbose_name="Etablissement d'origine",
     )
     email = models.EmailField(
