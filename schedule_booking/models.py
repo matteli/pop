@@ -160,7 +160,7 @@ class Student(models.Model):
     ]
 
     class Meta:
-        ordering = ["lastname", "firstname"]
+        ordering = ["email"]
 
     lastname = models.CharField(max_length=100, verbose_name="Nom")
     firstname = models.CharField(max_length=100, verbose_name="Prénom")
@@ -177,7 +177,7 @@ class Student(models.Model):
     people = models.IntegerField(default=1, verbose_name="Nombre de personne")
 
     def __str__(self):
-        return "%s %s" % (self.firstname, self.lastname)
+        return "%s %s (%s)" % (self.firstname, self.lastname, self.email)
 
 
 class Appointment(models.Model):
