@@ -159,6 +159,9 @@ class Student(models.Model):
         ),
     ]
 
+    class Meta:
+        ordering = ["lastname", "firstname"]
+
     lastname = models.CharField(max_length=100, verbose_name="Nom")
     firstname = models.CharField(max_length=100, verbose_name="Prénom")
     school = models.CharField(
