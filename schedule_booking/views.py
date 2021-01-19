@@ -76,7 +76,7 @@ def body_email(apps):
         f"\n\n"
         f"Le lycée Aristide Briand"
         f"\n\n"
-        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante : ce.0440069l@ac-nantes.fr."
+        f"Si vous voulez modifier un créneau ou le supprimer, répondez directement à cet email en précisant bien votre demande."
     )
     return s
 
@@ -94,7 +94,7 @@ def body_email_test(apps):
         f"\n\n"
         f"Le lycée Aristide Briand"
         f"\n\n"
-        f"Ne répondez pas à cet email. Si vous voulez contacter le lycée Aristide Briand, utilisez l'adresse mail suivante : ce.0440069l@ac-nantes.fr."
+        f"Si vous voulez modifier un créneau ou le supprimer, répondez directement à cet email en précisant bien votre demande."
     )
     return s
 
@@ -255,5 +255,5 @@ def scheduling_booking(request):
                 [student.email],
             )
             email.send()
-        context = {"apps": apps_dict}
+        context = {"apps": apps_dict, "email": student.email}
         return render(request, "booking_saved.html", context)
