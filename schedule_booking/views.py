@@ -71,12 +71,11 @@ def body_email(apps):
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
         f"\n\n"
         f"Le port du masque est obligatoire sur toute la cité scolaire. L'élève doit être accompagné par un seul adulte référent."
-        f"\n\n"
         f"Assurez-vous de pouvoir présenter cet email à l'entrée de la cité scolaire, soit sur papier, soit directement sur un smartphone."
+        f"Si vous voulez modifier un créneau ou le supprimer, répondez directement à cet email en précisant bien votre demande."
         f"\n\n"
         f"Le lycée Aristide Briand"
         f"\n\n"
-        f"Si vous voulez modifier un créneau ou le supprimer, répondez directement à cet email en précisant bien votre demande."
     )
     return s
 
@@ -89,12 +88,11 @@ def body_email_test(apps):
         f"""{r.join(f"- le {a['schedule__datetime'].strftime('%A %d/%m')} à {a['schedule__datetime'].strftime('%H:%M')} pour visiter l'emplacement {a['place__name']}"for a in apps)}"""
         f"\n\n"
         f"Le port du masque est obligatoire sur toute la cité scolaire. L'élève doit être accompagné par un seul adulte référent."
-        f"\n\n"
         f"Assurez-vous de pouvoir présenter cet email à l'entrée de la cité scolaire, soit sur papier, soit directement sur un smartphone."
+        f"Si vous voulez modifier un créneau ou le supprimer, répondez directement à cet email en précisant bien votre demande."
         f"\n\n"
         f"Le lycée Aristide Briand"
         f"\n\n"
-        f"Si vous voulez modifier un créneau ou le supprimer, répondez directement à cet email en précisant bien votre demande."
     )
     return s
 
